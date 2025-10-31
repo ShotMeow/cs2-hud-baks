@@ -1,12 +1,12 @@
 .boxes {
 	position: fixed;
-	bottom: 384px;
+	bottom: 244px;
 }
 .boxes.left {
-	left: 10px;
+	left: 20px;
 }
 .boxes.right {
-	right: 10px;
+	right: 20px;
 }
 .boxes.hide {
 	.utilitybox {
@@ -71,6 +71,182 @@
 		}
 	}
 }
+// Новый контейнер для рефакторенного компонента
+.sidebox-container {
+	width: 412px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	opacity: 1;
+	transition: opacity 0.75s;
+	
+	&.hide {
+		opacity: 0;
+	}
+	
+	// Зеркальное отображение для правой стороны
+	&.right {
+		.section-header {
+			flex-direction: row-reverse;
+		}
+		
+		.equipment-value-row {
+			flex-direction: row-reverse;
+		}
+		
+		.section-value {
+			text-align: right;
+		}
+		
+		.utility-status {
+			text-align: right;
+		}
+		
+		.loss-bonus-section,
+		.equipment-section {
+			align-items: flex-end !important;
+		}
+		
+		.loss-indicators {
+			flex-direction: row-reverse;
+		}
+	}
+	
+	// Верхний блок: Loss Bonus + Equipment Value
+	.top-block {
+		background-color: rgba(9, 10, 18, 0.4);
+		display: flex;
+		padding: 4px;
+		border-radius: 12px;
+		gap: 4px;
+		
+		.loss-bonus-section, .equipment-section {
+			width: 100%;
+			background-color: rgba(9, 10, 18, 0.4);
+			backdrop-filter: blur(40px);
+			border-radius: 8px;
+			padding: 12px;
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+			align-items: flex-start;
+		}
+		
+		.loss-bonus-section {
+			.section-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+				gap: 10px;
+				
+				.section-title {
+					color: #FFFFFF66;
+					font-size: 20px;
+					text-transform: uppercase;
+				}
+				
+				.loss-indicators {
+					display: flex;
+					margin-top: 6px;
+					gap: 4px;
+					
+					.loss-indicator {
+						width: 20px;
+						height: 4px;
+						border-radius: 2px;
+						transition: background-color 0.3s;
+					}
+				}
+			}
+			
+			.section-value {
+				color: white;
+				font-size: 20px;
+				text-align: center;
+			}
+		}
+		
+		.equipment-section {
+			.section-title {
+				color: #FFFFFF66;
+				font-size: 20px;
+				text-transform: uppercase;
+			}
+			
+			.equipment-value-row {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 8px;
+				
+				.section-value {
+					color: white;
+					font-size: 20px;
+				}
+				
+				.economy-badge {
+					font-size: 14px;
+					padding: 2px 6px;
+					border-radius: 6px;
+					text-transform: uppercase;
+				}
+			}
+		}
+	}
+	
+	// Нижний блок: Utility + Гранаты
+	.bottom-block {
+		background-color: rgba(9, 10, 18, 0.4);
+		backdrop-filter: blur(40px);
+		border-radius: 12px;
+		padding: 4px;
+		display: flex;
+		gap: 4px;
+		
+		.utility-status {
+			border-radius: 8px;
+			background-color: rgba(9, 10, 18, 0.4);
+			width: 100%;
+			padding: 12px;
+			
+			.utility-title {
+				color: #FFFFFF66;
+				font-size: 20px;
+				text-transform: uppercase;
+			}
+			
+			.utility-state {
+				font-size: 20px;
+				text-transform: uppercase;
+			}
+		}
+		
+		.grenade_container {
+			display: flex;
+			border-radius: 8px;
+			flex-direction: column;
+			width: 100%;
+			align-items: center;
+			padding: 12px;
+			background-color: rgba(9, 10, 18, 0.4);
+			
+			.grenade_image {
+				svg {
+					height: 20px;
+					width: auto;
+					filter: brightness(0) invert(1);
+				}
+			}
+			
+			.grenade_amount {
+				color: white;
+				font-size: 20px;
+			}
+		}
+	}
+}
+
+// Старые стили для совместимости (если используются где-то еще)
 .utilitybox {
 	width: 415px;
 	height: 70px;

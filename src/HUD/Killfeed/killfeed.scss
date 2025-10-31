@@ -20,7 +20,7 @@
 .killfeed {
     position: fixed;
     right: 20px;
-    top: 93px;
+    top: 20px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -32,7 +32,8 @@
     .single_kill {
         display: flex;
         flex-direction: row;
-        background-color: rgba(0,0,0,0.64);
+        background-color: rgba(9, 10, 18, 0.8);
+        border-radius: 12px;
         margin-bottom:5px;
         color:white;
         height: 38px;

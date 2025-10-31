@@ -1,0 +1,45 @@
+.mvp-test-panel {
+  position: fixed;
+  top: 300px;
+  right: 20px;
+  width: 300px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 12px;
+  color: white;
+  z-index: 9999;
+
+  h2 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    text-align: center;
+    color: #00EAFA;
+  }
+
+  .test-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
