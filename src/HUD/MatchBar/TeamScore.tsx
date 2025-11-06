@@ -29,10 +29,13 @@ const TeamScore = ({orientation, team, bo, wins }: IProps) => {
       return indicators;
     };
 
+    const teamName = team?.name || "";
+    const displayName = teamName.length > 6 ? teamName.slice(0, 6) + "..." : teamName;
+
     return (
       <>
         <div className={`team ${orientation} ${team.side || ''}`}>
-          <div className="team-name">{team?.name || null}</div>
+          <div className="team-name">{displayName || null}</div>
           <TeamLogo team={team} />
           {bo > 1 && (
             <div className={`win-indicators ${orientation}`}>

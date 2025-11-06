@@ -14,6 +14,7 @@ import { useAction } from "../../API/contexts/actions";
 import { Scout } from "../Scout";
 import OverlayTest from "../MatchBar/OverlayTest";
 import { OverlayProvider } from "../MatchBar/OverlayProvider";
+import TeamStats from "../TeamStats/TeamStats";
 
 interface Props {
   game: CSGO,
@@ -86,6 +87,8 @@ const Layout = ({game,match}: Props) => {
         
         {/* Тестовая панель MVP - удалить в продакшене */}
         {/* <OverlayTest /> */}
+
+        <TeamStats match={match} />
       </div>
     </OverlayProvider>
   );
