@@ -124,7 +124,6 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
         <RoundSummary 
           rounds={roundResults}
           currentRound={currentRoundNum}
-          phase={phase}
         />
       ),
       duration: 5000

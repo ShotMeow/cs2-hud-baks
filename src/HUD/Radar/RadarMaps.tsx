@@ -11,7 +11,6 @@ interface Props { match: Match | null, map: Map, game: CSGO }
 
 const RadarMaps = ({ match, map, game }: Props) => {
     const [ radarSize, setRadarSize ] = useState(366);
-    const [ showBig, setShowBig ] = useState(false);
     const [ tournament, setTournament ] = useState<Tournament | null>(null);
 
     useEffect(() => {
@@ -30,14 +29,10 @@ const RadarMaps = ({ match, map, game }: Props) => {
         setRadarSize(p => p-10);
     }, []);
 
-    useAction('toggleRadarView', () => {
-        setShowBig(p => !p);
-    }, []);
-
     return (
-        <div id={`radar_maps_container`} className={` ${showBig ? 'preview':''}`}>
+        <div id={`radar_maps_container`}>
             {match ? <MapsBar match={match} map={map} game={game} tournament={tournament} /> : null}
-            <Radar radarSize={showBig ? 600: radarSize} game={game} />
+            <Radar radarSize={radarSize} game={game} />
         </div>
     );
 }

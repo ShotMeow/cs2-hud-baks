@@ -340,3 +340,17 @@
     z-index: 10;
     pointer-events: none;
 }
+
+.avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: white;
+    opacity: 0.1;
+    font-size: 60px;
+     
+    > span {
+        padding-bottom: 26px;
+    }
+}

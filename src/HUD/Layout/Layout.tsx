@@ -3,14 +3,10 @@ import TeamBox from "./../Players/TeamBox";
 import MatchBar from "../MatchBar/MatchBar";
 import Observed from "./../Players/Observed";
 import RadarMaps from "./../Radar/RadarMaps";
-import Trivia from "../Trivia/Trivia";
 import UtilityLevel from '../SideBoxes/UtilityLevel';
 import Killfeed from "../Killfeed/Killfeed";
-import Overview from "../Overview/Overview";
-import Tournament from "../Tournament/Tournament";
 import { CSGO, KillEvent } from "csgogsi";
 import { Match } from "../../API/types";
-import { useAction } from "../../API/contexts/actions";
 import { GSI } from "../../API/HUD";
 import { Scout } from "../Scout";
 import { OverlayProvider } from "../MatchBar/OverlayProvider";
@@ -33,7 +29,6 @@ interface State {
 }*/
 
 const Layout = ({game,match}: Props) => {
-  const [ forceHide, setForceHide ] = useState(false);
   const [lastKillEvent, setLastKillEvent] = useState<KillEvent | null>(null);
   const [bombVideo, setBombVideo] = useState<string | null>(null);
   const bombVideoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -108,14 +103,6 @@ const Layout = ({game,match}: Props) => {
     };
   }, [bombData.state, bombData.player]);
 
-  useAction('boxesState', (state) => {
-    if (state === "show") {
-       setForceHide(false);
-    } else if (state === "hide") {
-      setForceHide(true);
-    }
-  });
-
   const left = game.map.team_ct.orientation === "left" ? game.map.team_ct : game.map.team_t;
   const right = game.map.team_ct.orientation === "left" ? game.map.team_t : game.map.team_ct;
 
@@ -146,24 +133,20 @@ const Layout = ({game,match}: Props) => {
         )}
         
         <Killfeed />
-        <Overview match={match} map={game.map} players={game.players || []} />
         <RadarMaps match={match} map={game.map} game={game} />
         <MatchBar map={game.map} phase={game.phase_countdowns} bomb={game.bomb} match={match} players={game.players} />
-       
-        <Tournament />
 
         <Observed player={game.player} />
 
         <TeamBox team={left} players={leftPlayers} side="left" current={game.player} lastKillEvent={lastKillEvent} bomb={game.bomb} />
         <TeamBox team={right} players={rightPlayers} side="right" current={game.player} lastKillEvent={lastKillEvent} bomb={game.bomb} />
 
-        <Trivia />
         <Scout left={left.side} right={right.side} />
         <div className={"boxes left"}>
           <UtilityLevel 
             side={left.side} 
             players={game.players} 
-            show={isFreezetime && !forceHide}
+            show={isFreezetime}
             loss={Math.min(left.consecutive_round_losses * 500 + 1400, 3400)}
             equipment={leftPlayers.map(player => player.state.equip_value).reduce((pre, now) => pre + now, 0)}
             money={leftPlayers.map(player => player.state.money).reduce((pre, now) => pre + now, 0)}
@@ -174,7 +157,7 @@ const Layout = ({game,match}: Props) => {
           <UtilityLevel 
             side={right.side} 
             players={game.players} 
-            show={isFreezetime && !forceHide}
+            show={isFreezetime}
             loss={Math.min(right.consecutive_round_losses * 500 + 1400, 3400)}
             equipment={rightPlayers.map(player => player.state.equip_value).reduce((pre, now) => pre + now, 0)}
             money={rightPlayers.map(player => player.state.money).reduce((pre, now) => pre + now, 0)}
@@ -184,6 +167,7 @@ const Layout = ({game,match}: Props) => {
         
         {/* Тестовая панель MVP - удалить в продакшене */}
         {/* <OverlayTest /> */}
+        <OverlayTest />
         <TeamStats match={match} />
         </OverlayProvider>
       </div>

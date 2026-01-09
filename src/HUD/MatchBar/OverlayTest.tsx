@@ -5,6 +5,9 @@ import RoundSummary from './RoundSummary';
 import StatsTable from './StatsTable';
 import './overlayTest.scss';
 
+// Import GSI for killfeed testing
+import { GSI } from '../../API/HUD';
+
 const createTestPlayer = (
   name: string,
   steamid: string,
@@ -152,7 +155,7 @@ const OverlayTest = () => {
     
     enqueueOverlay({
       type: 'roundSummary',
-      component: <RoundSummary rounds={rounds} currentRound={8} phase="freezetime" />,
+      component: <RoundSummary rounds={rounds} currentRound={8} />,
       duration: 5000
     });
     console.log('📊 Round Summary Test');
@@ -228,6 +231,92 @@ const OverlayTest = () => {
     testSupportMVP();
   };
 
+  // Killfeed testing functions
+  const testKillEvent = () => {
+    const killEvent: I.KillEvent = {
+      killer: createTestPlayer('Killer', '76561198000000001', 'CT', 100, 15, 3, 1200),
+      victim: createTestPlayer('Victim', '76561198000000002', 'T', 0, 8, 2, 800),
+      weapon: 'ak47',
+      headshot: false,
+      wallbang: false,
+      assister: null,
+      flashed: false,
+      attackerblind: false,
+      thrusmoke: false,
+      noscope: false,
+      attackerinair: false
+    };
+    
+    GSI.emit('kill', killEvent);
+    console.log('💀 Kill Event Test:', killEvent.killer?.name, 'killed', killEvent.victim.name);
+  };
+
+  const testHeadshotEvent = () => {
+    const killEvent: I.KillEvent = {
+      killer: createTestPlayer('Sniper', '76561198000000003', 'CT', 100, 12, 1, 900),
+      victim: createTestPlayer('Target', '76561198000000004', 'T', 0, 6, 1, 600),
+      weapon: 'awp',
+      headshot: true,
+      wallbang: false,
+      assister: null,
+      flashed: false,
+      attackerblind: false,
+      thrusmoke: false,
+      noscope: false,
+      attackerinair: false
+    };
+    
+    GSI.emit('kill', killEvent);
+    console.log('🎯 Headshot Event Test:', killEvent.killer?.name, 'headshotted', killEvent.victim.name);
+  };
+
+  const testAssistEvent = () => {
+    const killEvent: I.KillEvent = {
+      killer: createTestPlayer('Killer', '76561198000000005', 'CT', 85, 10, 2, 700),
+      victim: createTestPlayer('Victim', '76561198000000006', 'T', 0, 5, 1, 500),
+      weapon: 'm4a1',
+      headshot: false,
+      wallbang: false,
+      assister: createTestPlayer('Assister', '76561198000000007', 'CT', 90, 8, 4, 600),
+      flashed: false,
+      attackerblind: false,
+      thrusmoke: false,
+      noscope: false,
+      attackerinair: false
+    };
+    
+    GSI.emit('kill', killEvent);
+    console.log('🤝 Assist Event Test:', killEvent.killer?.name, 'killed', killEvent.victim.name, 'with assist from', killEvent.assister?.name);
+  };
+
+  const testWallbangEvent = () => {
+    const killEvent: I.KillEvent = {
+      killer: createTestPlayer('Wallbanger', '76561198000000008', 'T', 75, 14, 1, 1100),
+      victim: createTestPlayer('Unlucky', '76561198000000009', 'CT', 0, 9, 2, 750),
+      weapon: 'deagle',
+      headshot: false,
+      wallbang: true,
+      assister: null,
+      flashed: false,
+      attackerblind: false,
+      thrusmoke: false,
+      noscope: false,
+      attackerinair: false
+    };
+    
+    GSI.emit('kill', killEvent);
+    console.log('🔫 Wallbang Event Test:', killEvent.killer?.name, 'wallbanged', killEvent.victim.name);
+  };
+
+  const testMultipleKills = () => {
+    console.log('🔥 Testing multiple kills...');
+    
+    setTimeout(() => testKillEvent(), 0);
+    setTimeout(() => testHeadshotEvent(), 500);
+    setTimeout(() => testAssistEvent(), 1000);
+    setTimeout(() => testWallbangEvent(), 1500);
+  };
+
   return (
     <div className="mvp-test-panel">
       <h2>Overlay Test Panel</h2>
@@ -252,6 +341,17 @@ const OverlayTest = () => {
       </div>
 
       <div className="test-section">
+        <h3>Killfeed события:</h3>
+        <div className="test-buttons">
+          <button onClick={testKillEvent}>💀 Обычное убийство</button>
+          <button onClick={testHeadshotEvent}>🎯 Хэдшот</button>
+          <button onClick={testAssistEvent}>🤝 С ассистом</button>
+          <button onClick={testWallbangEvent}>🔫 Убийство сквозь стену</button>
+          <button onClick={testMultipleKills}>🔥 Несколько убийств</button>
+        </div>
+      </div>
+
+      <div className="test-section">
         <h3>Полная последовательность:</h3>
         <div className="test-buttons">
           <button onClick={testFullSequence}>🎬 MVP → Summary → Stats</button>
@@ -266,6 +366,8 @@ const OverlayTest = () => {
           <li>Каждый оверлей показывается 5 секунд</li>
           <li>Можно добавить несколько оверлеев подряд</li>
           <li>Кнопка "Очистить очередь" удаляет все ожидающие оверлеи</li>
+          <li>Killfeed события отправляются напрямую в компонент Killfeed</li>
+          <li>Множественные убийства показываются с задержкой для демонстрации очереди</li>
         </ul>
       </div>
     </div>

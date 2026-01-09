@@ -373,7 +373,7 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
       
       {/* Аватарка с HP баром и никнеймом */}
       <div className={`avatar-container ${(isObserved && !isDeathAnimationPlaying) ? 'active' : ''}`}>
-        <Avatar 
+        {player.avatar ? <Avatar 
           teamId={player.team.id} 
           steamid={player.steamid} 
           url={player.avatar} 
@@ -382,7 +382,7 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
           showSkull={player.state.health === 0} 
           showCam={false} 
           sidePlayer={true} 
-        />
+        /> : <div className="avatar-fallback"><span>{player.observer_slot}</span></div>}
         <div className="hp-bar-container">
           <div 
             className="hp-bar-background" 
@@ -396,7 +396,7 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
               }}
             />
           </div>
-          <div className="player-index">{player.observer_slot}</div>
+          {player.avatar && <div className="player-index">{player.observer_slot}</div>}
           <div className="nickname">{player.name}</div>
         </div>
       </div>

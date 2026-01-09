@@ -19,9 +19,8 @@ interface IProps {
 const Avatar = (
   { steamid, url, height, width, showCam, showSkull, sidePlayer, teamId }: IProps,
 ) => {
-  const data = useConfig("display_settings");
 
-  const avatarUrl = teamId && (data?.replace_avatars === "always" || (data?.replace_avatars === "if_missing" && !url)) ? `${apiUrl}api/teams/logo/${teamId}` : url;
+  const avatarUrl = url ?? `${apiUrl}api/teams/logo/${teamId}`;
   if(!avatarUrl && !showCam) return null;
   return (
     <div className={`avatar`}>
