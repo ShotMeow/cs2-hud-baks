@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as I from 'csgogsi';
 import { GSI } from '../../API/HUD';
 import { useOverlayQueue } from './OverlayProvider';
@@ -14,6 +14,61 @@ interface RoundResult {
   winType: 'bomb' | 'defuse' | 'elimination' | 'time';
 }
 
+interface VetoData {
+  mapName?: string;
+  mapEnd?: boolean;
+  rounds?: Array<{
+    winner?: 'CT' | 'T';
+    win_type?: 'bomb' | 'defuse' | 'elimination' | 'time';
+  } | null>;
+}
+
+const extractMapName = (fullMapName: string): string => {
+  return fullMapName.includes('/') ?
+    fullMapName.split('/').pop() || fullMapName :
+    fullMapName;
+};
+
+const findMatchingVeto = (vetos: VetoData[], baseMapName: string, fullMapName: string): VetoData | null => {
+  return vetos.find((v: VetoData) => {
+    const mapName = v.mapName ?? '';
+    const mapNameMatch = mapName === baseMapName ||
+      mapName === `de_${baseMapName}` ||
+      mapName === baseMapName.replace(/^de_/, '') ||
+      mapName === fullMapName ||
+      mapName === '';
+    return !(v.mapEnd ?? false) && mapNameMatch;
+  }) || null;
+};
+
+const getFallbackVeto = (vetos: VetoData[], fullMapName: string): VetoData | null => {
+  const allMapNamesEmpty = vetos.every(veto => !(veto.mapName ?? ''));
+  return vetos.find((v: VetoData, index: number) => {
+    const isActive = !(v.mapEnd ?? false);
+    const hasRounds = (v.rounds?.length ?? 0) > 0;
+    const isFirstWorkshop = index === 0 && fullMapName.includes('workshop');
+    return (isActive && hasRounds) || (isActive && isFirstWorkshop) || (isActive && allMapNamesEmpty && index === 0);
+  }) || null;
+};
+
+const reconstructRoundResults = (ctScore: number, tScore: number, currentRoundNum: number): RoundResult[] => {
+  const results: RoundResult[] = [];
+  let ctTempScore = 0;
+  let tTempScore = 0;
+
+  for (let i = 1; i < currentRoundNum; i++) {
+    if (ctTempScore < ctScore) {
+      results.push({ round: i, winner: 'CT', winType: 'elimination' });
+      ctTempScore++;
+    } else if (tTempScore < tScore) {
+      results.push({ round: i, winner: 'T', winType: 'elimination' });
+      tTempScore++;
+    }
+  }
+
+  return results;
+};
+
 interface OverlayManagerProps {
   map: I.Map;
   phase: I.CSGO["phase_countdowns"];
@@ -25,12 +80,115 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
   const [prevRound, setPrevRound] = useState(0);
   const [matchData, setMatchData] = useState<Match | null>(null);
   const [killEvents, setKillEvents] = useState<I.KillEvent[]>([]);
+  const [localRoundResults, setLocalRoundResults] = useState<RoundResult[]>([]);
   const hasProcessedRound = useRef(false);
 
   const currentRound = map.round + 1;
   const currentPhase = phase.phase || '';
 
-  // Загружаем данные матча
+  type EnqueueOverlay = typeof enqueueOverlay;
+
+  const showOverlays = useCallback((
+    roundResults: RoundResult[],
+    currentRoundNum: number,
+    phase: string,
+    mapData: I.Map,
+    playersData: I.Player[],
+    kills: I.KillEvent[],
+    match: Match | null,
+    enqueue: EnqueueOverlay
+  ) => {
+    // RoundMVP - если есть данные о предыдущем раунде
+    if (roundResults.length > 0) {
+      const prevRoundResult = roundResults[currentRoundNum - 2];
+      if (prevRoundResult) {
+        const mvpData = calculateMVP({
+          winner: { side: prevRoundResult.winner },
+          players: playersData
+        });
+
+        if (mvpData) {
+          enqueue({
+            type: 'mvp',
+            component: <RoundMVP mvpData={mvpData} />,
+            duration: 5000
+          });
+        }
+      }
+    }
+
+    // RoundSummary - всегда показываем
+    enqueue({
+      type: 'roundSummary',
+      component: (
+        <RoundSummary 
+          rounds={roundResults}
+          currentRound={currentRoundNum}
+          phase={phase}
+        />
+      ),
+      duration: 5000
+    });
+
+    // StatsTable - только каждый 5-й раунд
+    if (currentRoundNum % 5 === 0) {
+      const left = mapData.team_ct.orientation === "left" ? mapData.team_ct : mapData.team_t;
+      const right = mapData.team_ct.orientation === "left" ? mapData.team_t : mapData.team_ct;
+
+      enqueue({
+        type: 'statsTable',
+        component: (
+          <StatsTable 
+            leftTeam={left}
+            rightTeam={right}
+            players={playersData}
+            killEvents={kills}
+            matchData={match}
+          />
+        ),
+        duration: 5000
+      });
+    }
+  }, []);
+
+  const getRoundResults = useCallback((
+    matchDataValue: Match | null,
+    mapData: I.Map,
+    currentRoundNum: number,
+    localResults: RoundResult[]
+  ): { results: RoundResult[]; shouldUpdateLocal: boolean } => {
+    const baseMapName = extractMapName(mapData.name);
+    const vetos = (matchDataValue?.vetos || []) as unknown as VetoData[];
+    
+    const currentVeto = findMatchingVeto(vetos, baseMapName, mapData.name);
+    const fallbackVeto = !currentVeto || !currentVeto.rounds ? getFallbackVeto(vetos, mapData.name) : null;
+    const apiRoundsData = currentVeto?.rounds || fallbackVeto?.rounds || [];
+    
+    const apiRoundResults: RoundResult[] = apiRoundsData
+      .filter((r): r is NonNullable<typeof r> => r !== null)
+      .map((r, index: number) => ({
+        round: index + 1,
+        winner: r.winner || 'CT',
+        winType: r.win_type || 'elimination'
+      }));
+    
+    const finalResults = apiRoundResults.length > 0 ? apiRoundResults : localResults;
+    
+    // Reconstruct if needed
+    if (apiRoundResults.length === 0 && currentRoundNum > 1) {
+      const ctScore = mapData.team_ct.score;
+      const tScore = mapData.team_t.score;
+      const totalScore = ctScore + tScore;
+      
+      if (totalScore > 0 && localResults.length < totalScore) {
+        const reconstructed = reconstructRoundResults(ctScore, tScore, currentRoundNum);
+        return { results: reconstructed, shouldUpdateLocal: true };
+      }
+    }
+    
+    return { results: finalResults, shouldUpdateLocal: false };
+  }, []);
+  // Load match data and setup listeners
   useEffect(() => {
     const loadMatchData = async () => {
       try {
@@ -42,14 +200,13 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
     };
 
     loadMatchData();
+    const interval = setInterval(loadMatchData, 5000);
 
-    // Подписываемся на события убийств
     const handleKill = (kill: I.KillEvent) => {
-      setKillEvents(prev => [...prev, kill]);
+      setKillEvents((prev: I.KillEvent[]) => [...prev, kill]);
     };
 
-    // Очищаем kill события при начале нового раунда
-    const handleData = (data: any) => {
+    const handleData = (data: I.CSGO) => {
       if (data.round && data.round.phase === "freezetime") {
         if (Number(data.phase_countdowns?.phase_ends_in) < 10) {
           setKillEvents([]);
@@ -61,90 +218,34 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
     GSI.on('data', handleData);
 
     return () => {
+      clearInterval(interval);
       GSI.off('kill', handleKill);
       GSI.off('data', handleData);
     };
   }, []);
 
-  // Обработка окончания раунда и начала нового
+  // Handle round transitions and overlay display
   useEffect(() => {
-    // Проверяем, что раунд изменился
     if (currentRound !== prevRound) {
       setPrevRound(currentRound);
       hasProcessedRound.current = false;
     }
 
-    // Обрабатываем только в freezetime и только один раз за раунд
     if (currentPhase === 'freezetime' && !hasProcessedRound.current && currentRound > 1) {
       hasProcessedRound.current = true;
 
-      // Получаем данные о раундах
-      const currentVeto = matchData?.vetos.find((v: any) => !v.mapEnd && v.mapName === map.name);
-      const roundsData = currentVeto?.rounds || [];
-      const roundResults: RoundResult[] = roundsData
-        .filter((r: any): r is NonNullable<typeof r> => r !== null)
-        .map((r: any, index: number) => ({
-          round: index + 1,
-          winner: r.winner || 'CT',
-          winType: r.win_type
-        }));
+      const { results: roundResults, shouldUpdateLocal } = getRoundResults(matchData, map, currentRound, localRoundResults);
+      
+      if (shouldUpdateLocal) {
+        setLocalRoundResults(roundResults);
+      }
 
-      // Задержка 0.5 секунд перед началом показа оверлеев
       setTimeout(() => {
-        // 1. RoundMVP - если есть данные о предыдущем раунде
-        const prevRoundData = roundsData[currentRound - 2]; // -2 потому что currentRound уже новый
-        if (prevRoundData) {
-          const mvpData = calculateMVP({
-            winner: { side: prevRoundData.winner },
-            players: players
-          });
-
-          if (mvpData) {
-            enqueueOverlay({
-              type: 'mvp',
-              component: <RoundMVP mvpData={mvpData} />,
-              duration: 5000 // 5 секунд
-            });
-          }
-        }
-
-        // 2. RoundSummary - всегда показываем
-        enqueueOverlay({
-          type: 'roundSummary',
-          component: (
-            <RoundSummary 
-              rounds={roundResults}
-              currentRound={currentRound}
-              phase={currentPhase}
-            />
-          ),
-          duration: 5000 // 5 секунд
-        });
-
-        // 3. StatsTable - только каждый 5-й раунд
-        if (currentRound % 5 === 0) {
-          const left = map.team_ct.orientation === "left" ? map.team_ct : map.team_t;
-          const right = map.team_ct.orientation === "left" ? map.team_t : map.team_ct;
-
-          enqueueOverlay({
-            type: 'statsTable',
-            component: (
-              <StatsTable 
-                leftTeam={left}
-                rightTeam={right}
-                players={players}
-                killEvents={killEvents}
-                matchData={matchData}
-              />
-            ),
-            duration: 5000 // 5 секунд
-          });
-        }
+        showOverlays(roundResults, currentRound, currentPhase, map, players, killEvents, matchData, enqueueOverlay);
       }, 500);
     }
-  }, [currentPhase, currentRound, prevRound, map, players, matchData, killEvents, enqueueOverlay]);
+  }, [currentPhase, currentRound, prevRound, map, players, matchData, killEvents, enqueueOverlay, localRoundResults, getRoundResults, showOverlays]);
 
-  // Компонент не рендерит ничего
   return null;
 };
 

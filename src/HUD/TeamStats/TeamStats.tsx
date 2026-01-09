@@ -3,6 +3,8 @@ import { Match, Veto } from "../../API/types";
 import { useConfig } from "../../API/contexts/actions";
 import "./teamstats.scss";
 
+import qr from "../../assets/qr.webm";
+
 interface Props {
   match: Match | null;
 }
@@ -50,7 +52,7 @@ const TeamStats = ({ match }: Props) => {
   return (
     <div className="team-stats">
       <div className="">
-        <div className="team-stats__logo"></div>
+        <video src={qr} className="team-stats__logo" autoPlay loop muted playsInline />
       </div>
       
       <div className="team-stats__block team-stats__stat">

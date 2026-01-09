@@ -8,6 +8,7 @@ body,
 
 body {
   margin: 0;
+  overflow: hidden;
   font-family: "HeadingNow" , sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

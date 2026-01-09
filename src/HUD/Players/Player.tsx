@@ -1,12 +1,28 @@
 import * as I from "csgogsi";
 import Weapon from "./../Weapon/Weapon";
 import Avatar from "./Avatar";
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { HealthFull, C4, Defuse as DefuseIcon, ArmorHelmet, ArmorFull } from "../../assets/Icons";
+import saber from "../../assets/saber.webm";
+
+// Import death animations
+import deathBomb from "../../assets/deaths/HUD_Death_Bomb.webm";
+import deathFall from "../../assets/deaths/HUD_Death_Fall.webm";
+import deathFire from "../../assets/deaths/HUD_Death_Fire.webm";
+import deathGrenade from "../../assets/deaths/HUD_Death_Grenade.webm";
+import deathGrenadePunchFireCT from "../../assets/deaths/HUD_Death_GrenadePunch_Fire_CT.webm";
+import deathGrenadePunchFireT from "../../assets/deaths/HUD_Death_GrenadePunch_Fire_T.webm";
+import deathGrenadePunchFlash from "../../assets/deaths/HUD_Death_GrenadePunch_Flash.webm";
+import deathHeadshot from "../../assets/deaths/HUD_Death_HeadShot.webm";
+import deathKill from "../../assets/deaths/HUD_Death_Kill.webm";
+import deathKnife from "../../assets/deaths/HUD_Death_Knife.webm";
+import deathSmoke from "../../assets/deaths/HUD_Death_Smoke.webm";
 
 interface IProps {
   player: I.Player,
   isObserved: boolean,
+  lastKillEvent?: I.KillEvent | null,
+  bomb?: I.Bomb | null,
 }
 
 const compareWeapon = (weaponOne: I.WeaponRaw, weaponTwo: I.WeaponRaw) => {
@@ -65,7 +81,218 @@ const arePlayersEqual = (playerOne: I.Player, playerTwo: I.Player) => {
 
   return false;
 }
-const Player = ({ player, isObserved }: IProps) => {
+const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
+  const [isDeathAnimationPlaying, setIsDeathAnimationPlaying] = useState(false);
+  const [shouldShowDead, setShouldShowDead] = useState(player.state.health === 0);
+  const [currentKillEvent, setCurrentKillEvent] = useState<I.KillEvent | null>(null);
+  const [showSaber, setShowSaber] = useState(false);
+  const deathAnimationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saberTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const previousHealthRef = useRef<number | undefined>(undefined);
+  const previousRoundKillsRef = useRef(player.state.round_kills);
+
+  // Store kill event when it changes
+  useEffect(() => {
+    if (lastKillEvent && lastKillEvent.victim.steamid === player.steamid) {
+      console.log('Storing kill event for player:', player.name, lastKillEvent.weapon);
+      setCurrentKillEvent(lastKillEvent);
+      
+      // Clear stored event after some time
+      const timeout = setTimeout(() => {
+        setCurrentKillEvent(null);
+      }, 3000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [lastKillEvent, player.steamid, player.name]);
+
+  // Check for saber achievements
+  useEffect(() => {
+    const currentRoundKills = player.state.round_kills;
+    const previousRoundKills = previousRoundKillsRef.current;
+    
+    // Check for multi-kill achievements (3, 4, 5 kills in round)
+    if (currentRoundKills >= 3 && currentRoundKills !== previousRoundKills) {
+      console.log('Saber achievement: Multi-kill', player.name, currentRoundKills, 'kills');
+      triggerSaber();
+    }
+    
+    // Check for knife/zeus kills
+    if (lastKillEvent && lastKillEvent.killer?.steamid === player.steamid) {
+      const weapon = lastKillEvent.weapon.toLowerCase();
+      if (weapon.includes('knife') || weapon.includes('bayonet') || weapon.includes('taser')) {
+        console.log('Saber achievement: Knife/Zeus kill', player.name, 'with', weapon);
+        triggerSaber();
+      }
+    }
+    
+    // Check for bomb plant achievements (plant within 4 seconds of round end)
+    if (bomb && bomb.state === 'planted' && bomb.player?.steamid === player.steamid) {
+      // This is a simplified check - in real implementation you'd need round time tracking
+      console.log('Saber achievement: Bomb plant', player.name);
+      triggerSaber();
+    }
+    
+    // Check for defuse achievements (defuse within 2 seconds of explosion)
+    if (bomb && bomb.state === 'defused' && bomb.player?.steamid === player.steamid) {
+      console.log('Saber achievement: Bomb defuse', player.name);
+      triggerSaber();
+    }
+    
+    previousRoundKillsRef.current = currentRoundKills;
+  }, [player.state.round_kills, lastKillEvent, bomb, player.steamid, player.name]);
+
+  const triggerSaber = () => {
+    setShowSaber(true);
+    
+    // Clear existing timeout
+    if (saberTimeoutRef.current) {
+      clearTimeout(saberTimeoutRef.current);
+    }
+  };
+
+  const hideSaber = () => {
+    // Clear timeout
+    if (saberTimeoutRef.current) {
+      clearTimeout(saberTimeoutRef.current);
+    }
+    
+    // Hide immediately
+    setShowSaber(false);
+  };
+
+  // Death animation mapping function
+  const getDeathAnimation = (killEvent: I.KillEvent): string => {
+    const weapon = killEvent.weapon.toLowerCase();
+    const isHeadshot = killEvent.headshot;
+    
+    // Headshot deaths
+    if (isHeadshot) {
+      return deathHeadshot;
+    }
+    
+    // Knife deaths
+    if (weapon.includes('knife') || weapon.includes('bayonet')) {
+      return deathKnife;
+    }
+    
+    // Bomb deaths
+    if (weapon.includes('c4') || weapon.includes('bomb')) {
+      return deathBomb;
+    }
+    
+    // Fire deaths (molotov, incendiary)
+    if (weapon.includes('molotov') || weapon.includes('incendiary') || weapon.includes('fire')) {
+      // Use team-specific fire animations if available
+      if (player.team.side === 'CT') {
+        return deathGrenadePunchFireCT;
+      } else if (player.team.side === 'T') {
+        return deathGrenadePunchFireT;
+      }
+      return deathFire;
+    }
+    
+    // Grenade deaths
+    if (weapon.includes('hegrenade') || weapon.includes('grenade')) {
+      return deathGrenade;
+    }
+    
+    // Smoke deaths
+    if (weapon.includes('smoke')) {
+      return deathSmoke;
+    }
+    
+    // Flash deaths
+    if (weapon.includes('flashbang')) {
+      return deathGrenadePunchFlash;
+    }
+    
+    // Fall damage
+    if (weapon.includes('fall') || weapon.includes('worldspawn')) {
+      return deathFall;
+    }
+    
+    // Default kill animation
+    return deathKill;
+  };
+
+  // Handle death animation
+  useEffect(() => {
+    const currentHealth = player.state.health;
+    const previousHealth = previousHealthRef.current;
+    
+    // Check if player is already dead on first render
+    if (previousHealth === undefined && currentHealth === 0) {
+      setShouldShowDead(true);
+      previousHealthRef.current = currentHealth;
+      return;
+    }
+    
+    // Check if player just died (health went from >0 to 0)
+    if (previousHealth !== undefined && previousHealth > 0 && currentHealth === 0) {
+      // If we have a kill event for this player, start animation first
+      if (currentKillEvent) {
+        
+        // Start death animation
+        setIsDeathAnimationPlaying(true);
+        
+        // Clear any existing timeout
+        if (deathAnimationTimeoutRef.current) {
+          clearTimeout(deathAnimationTimeoutRef.current);
+        }
+        
+        // Show dead state after animation completes
+        deathAnimationTimeoutRef.current = setTimeout(() => {
+          console.log('Death animation timeout triggered for:', player.name);
+          setIsDeathAnimationPlaying(false);
+          setShouldShowDead(true);
+          console.log('Set shouldShowDead to true for:', player.name);
+        }, 1600);
+      } else {
+        
+        // Start default death animation
+        setIsDeathAnimationPlaying(true);
+        
+        // Clear any existing timeout
+        if (deathAnimationTimeoutRef.current) {
+          clearTimeout(deathAnimationTimeoutRef.current);
+        }
+        
+        // Show dead state after animation completes
+        deathAnimationTimeoutRef.current = setTimeout(() => {
+          console.log('Default death animation timeout triggered for:', player.name);
+          setIsDeathAnimationPlaying(false);
+          setShouldShowDead(true);
+          console.log('Set shouldShowDead to true for:', player.name);
+          console.log('Default death animation completed for:', player.name);
+        }, 1600);
+      }
+    }
+    
+    // Check if player respawned (health went from 0 to >0) - new round
+    if (previousHealth !== undefined && previousHealth === 0 && currentHealth > 0) {
+      setIsDeathAnimationPlaying(false);
+      setShouldShowDead(false);
+      
+      // Hide saber on new round
+      hideSaber();
+      
+      // Clear any existing timeout
+      if (deathAnimationTimeoutRef.current) {
+        clearTimeout(deathAnimationTimeoutRef.current);
+      }
+    }
+    
+    // Update previous health
+    previousHealthRef.current = currentHealth;
+    
+    // Cleanup
+    return () => {
+      if (deathAnimationTimeoutRef.current) {
+        clearTimeout(deathAnimationTimeoutRef.current);
+      }
+    };
+  }, [player.state.health, currentKillEvent, player.steamid, player.name]);
 
   const weapons = player.weapons.map(weapon => ({ ...weapon, name: weapon.name.replace("weapon_", "") }));
   const primary = weapons.filter(weapon => !['C4', 'Pistol', 'Knife', 'Grenade', undefined].includes(weapon.type))[0] || null;
@@ -106,7 +333,7 @@ const Player = ({ player, isObserved }: IProps) => {
   };
 
   const arrangedSlots = arrangeItemsInPyramid(footerItems);
-
+``
   // Цвета команд с прозрачностью для фона HP бара
   const teamColors = {
     t: { background: 'rgba(255, 85, 0, 0.3)', fill: '#FF5500' },
@@ -121,9 +348,31 @@ const Player = ({ player, isObserved }: IProps) => {
     : 0;
 
   return (
-    <div className={`player ${player.state.health === 0 ? "dead" : ""}`}>
+    <div className={`player ${shouldShowDead ? "dead" : ""}`}>
+      {showSaber && (
+        <video 
+          src={saber} 
+          className="player-saber" 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+        />
+      )}
+      
+      {/* Death animation overlay */}
+      {isDeathAnimationPlaying && (
+        <video 
+          src={currentKillEvent ? getDeathAnimation(currentKillEvent) : deathKill} 
+          className="player-death-animation" 
+          autoPlay 
+          muted 
+          playsInline 
+        />
+      )}
+      
       {/* Аватарка с HP баром и никнеймом */}
-      <div className={`avatar-container ${isObserved ? 'active' : ''}`}>
+      <div className={`avatar-container ${(isObserved && !isDeathAnimationPlaying) ? 'active' : ''}`}>
         <Avatar 
           teamId={player.team.id} 
           steamid={player.steamid} 
@@ -153,7 +402,7 @@ const Player = ({ player, isObserved }: IProps) => {
       </div>
 
       {/* Оружие и HP */}
-      <div className={`weapon-ammo-row ${player.state.health === 0 ? 'hidden' : ''}`}>
+      <div className={`weapon-ammo-row ${shouldShowDead ? "hidden" : ""}`}>
         <div className="weapon-container">
           <div 
             className="weapon-wrapper"
@@ -196,7 +445,7 @@ const Player = ({ player, isObserved }: IProps) => {
       </div>
 
       {/* Футер с предметами (гранаты + бомба/дефуз) в 5 слотов */}
-      <div className={`footer-items ${player.state.health === 0 ? 'hidden' : ''}`}>
+      <div className={`footer-items ${shouldShowDead ? "hidden" : ""}`}>
         {arrangedSlots.map((slot, index) => (
           <div key={index} className={`item-slot ${slot?.isActive ? 'active' : ''} ${sideKey}`}>
             {slot === null ? (
