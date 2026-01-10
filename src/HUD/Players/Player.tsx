@@ -94,7 +94,6 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
   // Store kill event when it changes
   useEffect(() => {
     if (lastKillEvent && lastKillEvent.victim.steamid === player.steamid) {
-      console.log('Storing kill event for player:', player.name, lastKillEvent.weapon);
       setCurrentKillEvent(lastKillEvent);
       
       // Clear stored event after some time
@@ -113,7 +112,6 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
     
     // Check for multi-kill achievements (3, 4, 5 kills in round)
     if (currentRoundKills >= 3 && currentRoundKills !== previousRoundKills) {
-      console.log('Saber achievement: Multi-kill', player.name, currentRoundKills, 'kills');
       triggerSaber();
     }
     
@@ -121,7 +119,6 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
     if (lastKillEvent && lastKillEvent.killer?.steamid === player.steamid) {
       const weapon = lastKillEvent.weapon.toLowerCase();
       if (weapon.includes('knife') || weapon.includes('bayonet') || weapon.includes('taser')) {
-        console.log('Saber achievement: Knife/Zeus kill', player.name, 'with', weapon);
         triggerSaber();
       }
     }
@@ -129,13 +126,11 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
     // Check for bomb plant achievements (plant within 4 seconds of round end)
     if (bomb && bomb.state === 'planted' && bomb.player?.steamid === player.steamid) {
       // This is a simplified check - in real implementation you'd need round time tracking
-      console.log('Saber achievement: Bomb plant', player.name);
       triggerSaber();
     }
     
     // Check for defuse achievements (defuse within 2 seconds of explosion)
     if (bomb && bomb.state === 'defused' && bomb.player?.steamid === player.steamid) {
-      console.log('Saber achievement: Bomb defuse', player.name);
       triggerSaber();
     }
     
@@ -243,10 +238,8 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
         
         // Show dead state after animation completes
         deathAnimationTimeoutRef.current = setTimeout(() => {
-          console.log('Death animation timeout triggered for:', player.name);
           setIsDeathAnimationPlaying(false);
           setShouldShowDead(true);
-          console.log('Set shouldShowDead to true for:', player.name);
         }, 1600);
       } else {
         
@@ -260,11 +253,8 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
         
         // Show dead state after animation completes
         deathAnimationTimeoutRef.current = setTimeout(() => {
-          console.log('Default death animation timeout triggered for:', player.name);
           setIsDeathAnimationPlaying(false);
           setShouldShowDead(true);
-          console.log('Set shouldShowDead to true for:', player.name);
-          console.log('Default death animation completed for:', player.name);
         }, 1600);
       }
     }
@@ -357,6 +347,9 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
           loop 
           muted 
           playsInline 
+          preload="metadata"
+          disablePictureInPicture
+          controls={false}
         />
       )}
       
@@ -368,6 +361,9 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
           autoPlay 
           muted 
           playsInline 
+          preload="metadata"
+          disablePictureInPicture
+          controls={false}
         />
       )}
       

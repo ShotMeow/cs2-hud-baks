@@ -61,15 +61,6 @@
             killFadeOut 0.8s cubic-bezier(0.4, 0, 0.2, 1),
             killGlow 2s ease-in-out infinite alternate;
     }
-    
-    // Hover эффект
-    &:hover {
-        transform: translateX(-5px) scale(1.02);
-        border-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 
-            0 12px 40px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    }
 
     img {
         max-height: 20px;

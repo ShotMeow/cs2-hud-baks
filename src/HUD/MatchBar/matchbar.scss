@@ -45,14 +45,6 @@
 			0 8px 32px rgba(0, 0, 0, 0.3),
 			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 		transition: all 0.3s ease;
-		
-		&:hover {
-			transform: translateY(-2px);
-			border-color: rgba(255, 255, 255, 0.2);
-			box-shadow: 
-				0 12px 40px rgba(0, 0, 0, 0.4),
-				inset 0 1px 0 rgba(255, 255, 255, 0.15);
-		}
 	}
 
 	.round-info {
@@ -161,14 +153,6 @@
 			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 		position: relative;
 		transition: all 0.3s ease;
-		
-		&:hover {
-			transform: translateY(-2px);
-			border-color: rgba(255, 255, 255, 0.2);
-			box-shadow: 
-				0 12px 40px rgba(0, 0, 0, 0.4),
-				inset 0 1px 0 rgba(255, 255, 255, 0.15);
-		}
 		
 		.logo {
 			position: absolute;
@@ -502,14 +486,6 @@
 	gap: 4px;
 	z-index: 9;
 	transition: all 0.3s ease;
-	
-	&:hover {
-		transform: translateX(-50%) translateY(-2px);
-		border-color: rgba(255, 255, 255, 0.2);
-		box-shadow: 
-			0 12px 40px rgba(0, 0, 0, 0.4),
-			inset 0 1px 0 rgba(255, 255, 255, 0.15);
-	}
 
 	.bomb-indicator,
 	.defuse-indicator {
