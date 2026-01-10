@@ -5,7 +5,6 @@ import { useBombTimer } from "./../Timers/Countdown";
 import { Match } from './../../API/types';
 import { C4, Defuse } from "../../assets/Icons";
 import OverlayManager from "./OverlayManager";
-import StatsTable from "./StatsTable";
 
 
 function stringToClock(time: string | number, pad = true) {

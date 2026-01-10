@@ -15,7 +15,6 @@ import { useBombTimer } from "../Timers/Countdown";
 import bombPlant from "../../assets/bombs/HUD_Bomb_Plant.webm";
 import defuse10s from "../../assets/bombs/HUD_Death_Bomb_Defuse_10s.webm";
 import defuse5s from "../../assets/bombs/HUD_Death_Bomb_Defuse_5s.webm";
-import OverlayTest from "../MatchBar/OverlayTest";
 
 interface Props {
   game: CSGO,
@@ -167,7 +166,6 @@ const Layout = ({game,match}: Props) => {
         
         {/* Тестовая панель MVP - удалить в продакшене */}
         {/* <OverlayTest /> */}
-        <OverlayTest />
         <TeamStats match={match} />
         </OverlayProvider>
       </div>

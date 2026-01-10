@@ -2,7 +2,6 @@ import CameraContainer from "../Camera/Container";
 import PlayerCamera from "./../Camera/Camera";
 
 import { Skull } from "./../../assets/Icons";
-import { useConfig } from "../../API/contexts/actions";
 import { apiUrl } from "../../API";
 
 interface IProps {

@@ -9,9 +9,22 @@
     display: flex;
     flex-direction: column;
     color: white;
-    background-color: rgba(9, 10, 18, 0.4);
-    backdrop-filter: blur(30px);
+    background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.7) 100%);
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     gap: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateX(-50%) translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
 
     // Аватарка игрока
     .avatar {
@@ -40,6 +53,9 @@
         justify-content: space-between;
         align-items: center;
         overflow: hidden;
+        background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.7) 100%);
+        backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         
         .health-fill {
             position: absolute;
@@ -150,8 +166,11 @@
         }
         
         .badge {
-            background: rgba(9, 10, 18, 0.4);
-            backdrop-filter: blur(30px);
+            background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.7) 100%);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             padding: 8px;
             border-radius: 8px;
             display: flex;
@@ -161,6 +180,14 @@
             font-size: 20px;
             height: 16px;
             min-width: 16px;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                transform: translateY(-1px);
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            }
             
             .stat-label {
                 color: rgba(255, 255, 255, 0.3);
@@ -190,6 +217,7 @@
             
             .health-fill {
                 background-color: var(--color-new-t);
+                box-shadow: 0 0 10px rgba(255, 85, 0, 0.3);
             }
         }
     }
@@ -198,9 +226,11 @@
     &.CT {
         .health-bar {
             background-color: rgba(130, 88, 255, 0.3);
+            box-shadow: inset 0 0 10px rgba(130, 88, 255, 0.2);
             
             .health-fill {
                 background-color: var(--color-new-ct);
+                box-shadow: 0 0 10px rgba(130, 88, 255, 0.3);
             }
         }
     }

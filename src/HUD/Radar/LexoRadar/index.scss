@@ -240,12 +240,9 @@ html, body, .map-container {
 
 .map .player .label {
     color: white;
-    font-weight: 600;
     border-radius: 50%;
     transition: background-color 0.5s;
-    -webkit-font-smoothing: crisp-edges;
-    font-size: 37px;
-    text-shadow: 4px 4px 0 black;
+    font-size: 40px;
 }
 .map .bomb {
     transition:transform 0.1s ease;
@@ -267,10 +264,10 @@ html, body, .map-container {
     animation: BombDefused 2s 1 forwards;
 }
 .map .player.CT .label {
-    background: rgb(16, 88, 197)
+    background: var(--color-new-ct);
 }
 .map .player.T .label {
-    background: rgb(255, 153, 0);
+    background: var(--color-new-t);
 }
 .map .player.T.hasBomb .label {
     background: red;

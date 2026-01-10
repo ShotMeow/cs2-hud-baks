@@ -19,95 +19,221 @@
 
 .killfeed {
     position: fixed;
-    right: 20px;
     top: 20px;
+    right: 20px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    .single_kill_container {
-        animation: KillLifeCycle 5s linear 1;
-        animation-fill-mode: forwards;/**/
-        overflow: hidden;
-    }
-    .single_kill {
-        display: flex;
-        flex-direction: row;
-        background-color: rgba(9, 10, 18, 0.8);
-        border-radius: 12px;
-        margin-bottom:5px;
-        color:white;
-        height: 38px;
-        font-size: 14px;
-        overflow: hidden;
-        align-items: center;
-        font-family: Montserrat;
-        font-weight:500;
-        padding-left:15px;
-        padding-right:15px;
+    z-index: 1000;
+    pointer-events: none;
+}
 
-        > svg {
+.single_kill {
+    display: flex;
+    flex-direction: row;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.7) 100%);
+    backdrop-filter: blur(40px);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    color: white;
+    font-size: 20px;
+    overflow: hidden;
+    align-items: center;
+    padding: 6px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+    // Анимация появления
+    animation: 
+        killSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+        killGlow 2s ease-in-out infinite alternate;
+    
+    // Анимация исчезновения
+    &.fade-out {
+        animation: 
+            killFadeOut 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+            killGlow 2s ease-in-out infinite alternate;
+    }
+    
+    // Hover эффект
+    &:hover {
+        transform: translateX(-5px) scale(1.02);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    img {
+        max-height: 20px;
+        max-width: 22px;
+    }
+
+    div {
+        margin-right: 10px;
+    }
+
+    svg.weapon {
+        height: 18px;
+        filter: invert(0%);
+        transition: all 0.3s ease;
+    }
+    
+    // Эффект для оружия при хэдшоте
+    &.headshot svg.weapon {
+        filter: invert(0%) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        transform: scale(1.2);
+    }
+    
+    // Эффект для wallbang
+    &.wallbang {
+        border-color: rgba(255, 100, 100, 0.3);
+        background: linear-gradient(135deg, rgba(255, 50, 50, 0.1) 0%, rgba(9, 10, 18, 0.7) 100%);
+    }
+    
+    // Цветовые темы для команд
+    &.ct-kill {
+        border-color: rgba(130, 88, 255, 0.3);
+        background: linear-gradient(135deg, rgba(130, 88, 255, 0.1) 0%, rgba(9, 10, 18, 0.7) 100%);
+        
+        .killer {
+            color: #8258FF;
+        }
+    }
+    
+    &.t-kill {
+        border-color: rgba(255, 85, 0, 0.3);
+        background: linear-gradient(135deg, rgba(255, 85, 0, 0.1) 0%, rgba(9, 10, 18, 0.7) 100%);
+        
+        .killer {
+            color: #FF5500;
+        }
+    }
+    
+    // Эффект для assister
+    .assister {
+        color: rgba(100, 200, 255, 0.9);
+        font-weight: 600;
+        position: relative;
+        
+        &::before {
+            content: '+';
+            margin: 0 4px;
+            opacity: 0.7;
+        }
+    }
+    
+    // Имена игроков
+    .killer {
+        color: #00EAFA;
+        font-weight: 700;
+    }
+    
+    .victim {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+    
+    .CT {
+        color: var(--color-new-ct);
+    }
+
+    .T {
+        color: var(--color-new-t);
+    }
+
+    .way .headshot, .way .wallbang, .flash_assist, .flash_kill, .smoke_kill, .noscope_kill {
+        max-height:20px;
+        margin-left:5px;
+    }
+
+    .flash_assist {
+        margin-left: 0;
+        margin-right:5px;
+    }
+
+    .plus {
+        margin-left: 0;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .assister_name {
+        margin-left:0px;
+    }
+
+    .way {
+        display: flex;
+        gap: 12px;
+        text-align: center;
+
+        .wallbang {
+            max-height: 24px;
+        }
+        svg:not(.weapon) {
             max-height: 24px;
             max-width: 28px;
         }
+    }
+    
+    &.hide {
+        transition:height 1s, padding 1s,  opacity 1s, margin 1s;
+        opacity:0;
+        height:0;
+        margin:0;
+    }
+    
+    &.show {
+        opacity:1;
+    }
+}
 
-        div {
-            margin:10px;
-            display:flex;
-            align-items:center;
-        }
+// Ключевые анимации
+@keyframes killSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(100px) scale(0.8);
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateX(-10px) scale(1.05);
+        filter: blur(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        filter: blur(0);
+    }
+}
 
-        svg.weapon {
-            height: 28px;
-            filter: invert(0%);
-        }
+@keyframes killFadeOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(50px) scale(0.9);
+        filter: blur(5px);
+    }
+}
 
-        .CT {
-            color: var(--color-new-ct);
-        }
-
-        .T {
-            color: var(--color-new-t);
-        }
-
-        .way .headshot, .way .wallbang, .flash_assist, .flash_kill, .smoke_kill, .noscope_kill {
-            max-height:20px;
-            margin-left:5px;
-        }
-
-        .flash_assist {
-            margin-left: 0;
-            margin-right:5px;
-        }
-
-        .plus {
-            margin-left: 0;
-            font-weight: 600;
-            margin-right: 8px;
-        }
-
-        .assister_name {
-            margin-left:0px;
-        }
-
-        .way {
-            text-align: center;
-
-            .wallbang {
-                max-height: 24px;
-            }
-            svg:not(.weapon) {
-                max-height: 24px;
-                max-width: 28px;
-            }
-        }
-        &.hide {
-            transition:height 1s, padding 1s,  opacity 1s, margin 1s;
-            opacity:0;
-            height:0;
-            margin:0;
-        }
-        &.show {
-            opacity:1;
-        }
+@keyframes killGlow {
+    0% {
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 20px rgba(0, 234, 250, 0.05);
+    }
+    100% {
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 30px rgba(0, 234, 250, 0.1);
     }
 }

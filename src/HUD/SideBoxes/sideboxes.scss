@@ -84,6 +84,44 @@
 		opacity: 0;
 	}
 	
+	// Стили для CT команды
+	&.CT {
+		.top-block, .bottom-block {
+			border-color: rgba(130, 88, 255, 0.3);
+			background-color: rgba(0, 0, 0, .4);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1),
+				0 0 20px rgba(130, 88, 255, 0.1) inset;
+		}
+		
+		.loss-bonus-section, .equipment-section, .utility-status, .grenade_container {
+			border-color: rgba(130, 88, 255, 0.3);
+			background: linear-gradient(135deg, rgba(130, 88, 255, 0.1) 0%, rgba(9, 10, 18, 0.7) 100%);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1),
+				0 0 15px rgba(130, 88, 255, 0.05) inset;
+		}
+	}
+	
+	// Стили для T команды
+	&.T {
+		.top-block, .bottom-block {
+			border-color: rgba(255, 85, 0, 0.1);
+			background-color: rgba(0, 0, 0, .4);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1),
+				0 0 20px rgba(255, 85, 0, 0.1) inset;
+		}
+		
+		.loss-bonus-section, .equipment-section, .utility-status, .grenade_container {
+			border-color: rgba(255, 85, 0, 0.1);
+			background: linear-gradient(135deg, rgba(255, 85, 0, 0.1) 0%, rgba(9, 10, 18, 0.7) 100%);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1),
+				0 0 15px rgba(255, 85, 0, 0.05) inset;
+		}
+	}
+	
 	// Зеркальное отображение для правой стороны
 	&.right {
 		.section-header {
@@ -114,22 +152,38 @@
 	
 	// Верхний блок: Loss Bonus + Equipment Value
 	.top-block {
-		background-color: rgba(9, 10, 18, 0.4);
+		backdrop-filter: blur(40px);
 		display: flex;
 		padding: 4px;
 		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1);
+		transition: all 0.3s ease;
 		gap: 4px;
+		
+		&:hover {
+			transform: translateY(-2px);
+			border-color: rgba(255, 255, 255, 0.2);
+			box-shadow: 
+				0 12px 40px rgba(0, 0, 0, 0.4),
+				inset 0 1px 0 rgba(255, 255, 255, 0.15);
+		}
 		
 		.loss-bonus-section, .equipment-section {
 			width: 100%;
-			background-color: rgba(9, 10, 18, 0.4);
 			backdrop-filter: blur(40px);
 			border-radius: 8px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1);
 			padding: 12px;
 			display: flex;
 			flex-direction: column;
 			gap: 4px;
 			align-items: flex-start;
+			transition: all 0.3s ease;
 		}
 		
 		.loss-bonus-section {
@@ -141,6 +195,7 @@
 				
 				.section-title {
 					color: #FFFFFF66;
+					text-wrap: nowrap;
 					font-size: 20px;
 					text-transform: uppercase;
 				}
@@ -196,18 +251,34 @@
 	
 	// Нижний блок: Utility + Гранаты
 	.bottom-block {
-		background-color: rgba(9, 10, 18, 0.4);
 		backdrop-filter: blur(40px);
 		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 		padding: 4px;
 		display: flex;
 		gap: 4px;
+		transition: all 0.3s ease;
+		
+		&:hover {
+			transform: translateY(-2px);
+			border-color: rgba(255, 255, 255, 0.2);
+			box-shadow: 
+				0 12px 40px rgba(0, 0, 0, 0.4),
+				inset 0 1px 0 rgba(255, 255, 255, 0.15);
+		}
 		
 		.utility-status {
 			border-radius: 8px;
-			background-color: rgba(9, 10, 18, 0.4);
+			backdrop-filter: blur(40px);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1);
 			width: 100%;
 			padding: 12px;
+			transition: all 0.3s ease;
 			
 			.utility-title {
 				color: #FFFFFF66;
@@ -228,7 +299,11 @@
 			width: 100%;
 			align-items: center;
 			padding: 12px;
-			background-color: rgba(9, 10, 18, 0.4);
+			backdrop-filter: blur(40px);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: 
+				inset 0 1px 0 rgba(255, 255, 255, 0.1);
+			transition: all 0.3s ease;
 			
 			.grenade_image {
 				svg {

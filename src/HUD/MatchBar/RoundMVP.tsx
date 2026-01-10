@@ -32,10 +32,10 @@ const RoundMVP: React.FC<RoundMVPProps> = ({ mvpData }) => {
   return (
     <div className="round-mvp">
       <div className="mvp-avatar">
-        <img 
+        {mvpData.player.avatar ? <img 
           src={mvpData.player.avatar || '/default-avatar.png'} 
           alt={mvpData.player.name}
-        />
+        /> : <div className="avatar-fallback"><span>{mvpData.player.observer_slot}</span></div>}
       </div>
       <div className="mvp-info">
         <div className="mvp-header">

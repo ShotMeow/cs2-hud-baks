@@ -2,22 +2,9 @@ import React, { useState } from "react";
 import { Player } from "csgogsi";
 import Weapon from "./../Weapon/Weapon";
 import Avatar from "./Avatar";
-import TeamLogo from "./../MatchBar/TeamLogo";
 import "./observed.scss";
-import { getCountry } from "./../countries";
-import { ArmorHelmet, ArmorFull, HealthFull, Bullets } from './../../assets/Icons';
-import { apiUrl } from './../../API';
+import { ArmorHelmet, ArmorFull, HealthFull } from './../../assets/Icons';
 import { useAction } from "../../API/contexts/actions";
-
-
-const Statistic = React.memo(({ label, value, color }: { label: string; value: string | number; color?: string }) => {
-	return (
-		<div className="stat">
-			<span className="label">{label}</span>
-			<span className="value" style={{ color }}>{value}</span>
-		</div>
-	);
-});
 
 const Observed = ({ player }: { player: Player | null }) => {
 	const [ showCam, setShowCam ] = useState(true);
@@ -36,7 +23,7 @@ const Observed = ({ player }: { player: Player | null }) => {
 	return (
 		<div className={`observed ${player.team.side}`}>
 			{/* Аватарка игрока */}
-			<Avatar 
+			{player.avatar && <Avatar 
 				teamId={player.team.id} 
 				url={player.avatar} 
 				steamid={player.steamid} 
@@ -44,7 +31,7 @@ const Observed = ({ player }: { player: Player | null }) => {
 				width={140} 
 				showCam={showCam} 
 				slot={player.observer_slot} 
-			/>
+			/>}
 			
 			{/* Индикатор здоровья */}
 			<div className="health-bar">
@@ -63,7 +50,6 @@ const Observed = ({ player }: { player: Player | null }) => {
 			<div className="info-row">
 				<div className="username">{player.name}</div>
 				<div className="weapon-ammo">
-					{currentWeapon && <Weapon weapon={currentWeapon.name} active={true} />}
 					<div className="ammo-info">
 						<span className="ammo-clip">{(currentWeapon && currentWeapon.ammo_clip) || "-"}</span>
 						<span className="ammo-separator">/</span>
