@@ -1,7 +1,7 @@
 {
-  "name": "cs2-react-hud",
+  "name": "baks-hud",
   "private": true,
-  "version": "1.0.6",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "zip": "npm-build-zip",

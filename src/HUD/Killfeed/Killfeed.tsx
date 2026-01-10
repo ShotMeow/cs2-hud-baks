@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { KillEvent, Player } from 'csgogsi';
 import Kill from './Kill';
 import './killfeed.scss';
-import { onGSI } from '../../API/contexts/actions';
+import { onGSI, useConfig } from '../../API/contexts/actions';
 
 
 export interface ExtendedKillEvent extends KillEvent {
@@ -22,6 +22,7 @@ export interface AnimatedEvent {
 }
 
 const KillfeedComponent = () => {
+    const config = useConfig("team_stats");
     const [ events, setEvents ] = useState<AnimatedEvent[]>([]);
     const timeoutRefs = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
@@ -100,7 +101,7 @@ const KillfeedComponent = () => {
     }, []);
 
     return (
-        <div className="killfeed">
+        <div className={`killfeed ${config?.selected_team ? 'padding' : ''}`}>
             {events.map(event => (
                 <Kill 
                     key={event.id} 

@@ -26,6 +26,10 @@
     align-items: flex-end;
     z-index: 1000;
     pointer-events: none;
+
+    &.padding {
+        padding-top: 86px;
+    }
 }
 
 .single_kill {
