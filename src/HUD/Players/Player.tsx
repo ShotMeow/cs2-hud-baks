@@ -225,38 +225,20 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
     
     // Check if player just died (health went from >0 to 0)
     if (previousHealth !== undefined && previousHealth > 0 && currentHealth === 0) {
-      // If we have a kill event for this player, start animation first
-      if (currentKillEvent) {
-        
-        // Start death animation
-        setIsDeathAnimationPlaying(true);
-        
-        // Clear any existing timeout
-        if (deathAnimationTimeoutRef.current) {
-          clearTimeout(deathAnimationTimeoutRef.current);
-        }
-        
-        // Show dead state after animation completes
-        deathAnimationTimeoutRef.current = setTimeout(() => {
-          setIsDeathAnimationPlaying(false);
-          setShouldShowDead(true);
-        }, 1600);
-      } else {
-        
-        // Start default death animation
-        setIsDeathAnimationPlaying(true);
-        
-        // Clear any existing timeout
-        if (deathAnimationTimeoutRef.current) {
-          clearTimeout(deathAnimationTimeoutRef.current);
-        }
-        
-        // Show dead state after animation completes
-        deathAnimationTimeoutRef.current = setTimeout(() => {
-          setIsDeathAnimationPlaying(false);
-          setShouldShowDead(true);
-        }, 1600);
+      // Start death animation - use currentKillEvent if available, otherwise use default
+      setIsDeathAnimationPlaying(true);
+      setShouldShowDead(false);
+      
+      // Clear any existing timeout
+      if (deathAnimationTimeoutRef.current) {
+        clearTimeout(deathAnimationTimeoutRef.current);
       }
+      
+      // Show dead state after animation completes
+      deathAnimationTimeoutRef.current = setTimeout(() => {
+        setIsDeathAnimationPlaying(false);
+        setShouldShowDead(true);
+      }, 1600);
     }
     
     // Check if player respawned (health went from 0 to >0) - new round
@@ -282,7 +264,7 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
         clearTimeout(deathAnimationTimeoutRef.current);
       }
     };
-  }, [player.state.health, currentKillEvent, player.steamid, player.name]);
+  }, [player.state.health, player.steamid, player.name]);
 
   const weapons = player.weapons.map(weapon => ({ ...weapon, name: weapon.name.replace("weapon_", "") }));
   const primary = weapons.filter(weapon => !['C4', 'Pistol', 'Knife', 'Grenade', undefined].includes(weapon.type))[0] || null;
