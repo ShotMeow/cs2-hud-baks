@@ -320,127 +320,129 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
     : 0;
 
   return (
-    <div className={`player ${shouldShowDead ? "dead" : ""}`}>
+    <div>
       {showSaber && (
-        <video 
-          src={saber} 
-          className="player-saber" 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          preload="metadata"
-          disablePictureInPicture
-          controls={false}
-        />
-      )}
-      
-      {/* Death animation overlay */}
-      {isDeathAnimationPlaying && (
-        <video 
-          src={currentKillEvent ? getDeathAnimation(currentKillEvent) : deathKill} 
-          className="player-death-animation" 
-          autoPlay 
-          muted 
-          playsInline 
-          preload="metadata"
-          disablePictureInPicture
-          controls={false}
-        />
-      )}
-      
-      {/* Аватарка с HP баром и никнеймом */}
-      <div className={`avatar-container ${(isObserved && !isDeathAnimationPlaying) ? 'active' : ''}`}>
-        {player.avatar ? <Avatar 
-          teamId={player.team.id} 
-          steamid={player.steamid} 
-          url={player.avatar} 
-          height={120} 
-          width={132} 
-          showSkull={player.state.health === 0} 
-          showCam={false} 
-          sidePlayer={true} 
-        /> : <div className="avatar-fallback"><span>{player.observer_slot}</span></div>}
-        <div className="hp-bar-container">
-          <div 
-            className="hp-bar-background" 
-            style={{ backgroundColor: colors.background }}
-          >
+          <video 
+            src={saber} 
+            className="player-saber" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            preload="metadata"
+            disablePictureInPicture
+            controls={false}
+          />
+        )}
+      <div className={`player ${shouldShowDead ? "dead" : ""}`}>
+        
+        {/* Death animation overlay */}
+        {isDeathAnimationPlaying && (
+          <video 
+            src={currentKillEvent ? getDeathAnimation(currentKillEvent) : deathKill} 
+            className="player-death-animation" 
+            autoPlay 
+            muted 
+            playsInline 
+            preload="metadata"
+            disablePictureInPicture
+            controls={false}
+          />
+        )}
+        
+        {/* Аватарка с HP баром и никнеймом */}
+        <div className={`avatar-container ${(isObserved && !isDeathAnimationPlaying) ? 'active' : ''}`}>
+          {player.avatar ? <Avatar 
+            teamId={player.team.id} 
+            steamid={player.steamid} 
+            url={player.avatar} 
+            height={120} 
+            width={132} 
+            showSkull={player.state.health === 0} 
+            showCam={false} 
+            sidePlayer={true} 
+          /> : <div className="avatar-fallback"><span>{player.observer_slot}</span></div>}
+          <div className="hp-bar-container">
             <div 
-              className="hp-bar-fill" 
-              style={{ 
-                width: `${player.state.health}%`,
-                backgroundColor: colors.fill
-              }}
-            />
-          </div>
-          {player.avatar && <div className="player-index">{player.observer_slot}</div>}
-          <div className="nickname">{player.name}</div>
-        </div>
-      </div>
-
-      {/* Оружие и HP */}
-      <div className={`weapon-ammo-row ${shouldShowDead ? "hidden" : ""}`}>
-        <div className="weapon-container">
-          <div 
-            className="weapon-wrapper"
-            style={{
-              WebkitMaskImage: currentWeapon ? `linear-gradient(to right, black ${ammoPercentage}%, rgba(0, 0, 0, 0.4) ${ammoPercentage}%)` : undefined,
-              maskImage: currentWeapon ? `linear-gradient(to right, black ${ammoPercentage}%, rgba(0, 0, 0, 0.4) ${ammoPercentage}%)` : undefined
-            }}
-          >
-            {currentWeapon && (
-              <Weapon 
-                weapon={currentWeapon.name} 
-                active={currentWeapon.state === "active"} 
+              className="hp-bar-background" 
+              style={{ backgroundColor: colors.background }}
+            >
+              <div 
+                className="hp-bar-fill" 
+                style={{ 
+                  width: `${player.state.health}%`,
+                  backgroundColor: colors.fill
+                }}
               />
-            )}
-          </div>
-        </div>
-        <div className="hp-display">
-          {player.state.armor > 0 && (
-            <div className="armor-icon">
-              {player.state.helmet ? <ArmorHelmet /> : <ArmorFull />}
             </div>
-          )}
-          <HealthFull />
-          <span className="hp-value">{player.state.health}</span>
+            {player.avatar && <div className="player-index">{player.observer_slot}</div>}
+            <div className="nickname">{player.name}</div>
+          </div>
         </div>
-      </div>
 
-      {/* Статистика K/D и деньги */}
-      <div className="stats-row">
-        <div className="kd-stat">
-            <span className="stat-label">K</span>
-            <span className="stat-value">{player.stats.kills}</span>
-            {player.state.round_kills !== 0 && <span className="stat-assists">{player.state.round_kills}</span>}
+        {/* Оружие и HP */}
+        <div className={`weapon-ammo-row ${shouldShowDead ? "hidden" : ""}`}>
+          <div className="weapon-container">
+            <div 
+              className="weapon-wrapper"
+              style={{
+                WebkitMaskImage: currentWeapon ? `linear-gradient(to right, black ${ammoPercentage}%, rgba(0, 0, 0, 0.4) ${ammoPercentage}%)` : undefined,
+                maskImage: currentWeapon ? `linear-gradient(to right, black ${ammoPercentage}%, rgba(0, 0, 0, 0.4) ${ammoPercentage}%)` : undefined
+              }}
+            >
+              {currentWeapon && (
+                <Weapon 
+                  weapon={currentWeapon.name} 
+                  active={currentWeapon.state === "active"} 
+                />
+              )}
+            </div>
           </div>
+          <div className="hp-display">
+            {player.state.armor > 0 && (
+              <div className="armor-icon">
+                {player.state.helmet ? <ArmorHelmet /> : <ArmorFull />}
+              </div>
+            )}
+            <HealthFull />
+            <span className="hp-value">{player.state.health}</span>
+          </div>
+        </div>
+
+        {/* Статистика K/D и деньги */}
+        <div className="stats-row">
           <div className="kd-stat">
-            <span className="stat-label">D</span>
-            <span className="stat-value">{player.stats.deaths}</span>
-          </div>
-        <div className="money">{player.state.money}</div>
-      </div>
+              <span className="stat-label">K</span>
+              <span className="stat-value">{player.stats.kills}</span>
+              {player.state.round_kills !== 0 && <span className="stat-assists">{player.state.round_kills}</span>}
+            </div>
+            <div className="kd-stat">
+              <span className="stat-label">D</span>
+              <span className="stat-value">{player.stats.deaths}</span>
+            </div>
+          <div className="money">{player.state.money}</div>
+        </div>
 
-      {/* Футер с предметами (гранаты + бомба/дефуз) в 5 слотов */}
-      <div className={`footer-items ${shouldShowDead ? "hidden" : ""}`}>
-        {arrangedSlots.map((slot, index) => (
-          <div key={index} className={`item-slot ${slot?.isActive ? 'active' : ''} ${sideKey}`}>
-            {slot === null ? (
-              <div className="empty-dot" />
-            ) : slot.type === 'grenade' ? (
-              <Weapon 
-                weapon={slot.data.name} 
-                active={slot.data.state === "active"} 
-                isGrenade 
-              />
-            ) : slot.type === 'bomb' ? (
-              <C4 />
-            ) : slot.type === 'defuse' ? (
-              <DefuseIcon />
-            ) : null}
-          </div>
-        ))}
+        {/* Футер с предметами (гранаты + бомба/дефуз) в 5 слотов */}
+        <div className={`footer-items ${shouldShowDead ? "hidden" : ""}`}>
+          {arrangedSlots.map((slot, index) => (
+            <div key={index} className={`item-slot ${slot?.isActive ? 'active' : ''} ${sideKey}`}>
+              {slot === null ? (
+                <div className="empty-dot" />
+              ) : slot.type === 'grenade' ? (
+                <Weapon 
+                  weapon={slot.data.name} 
+                  active={slot.data.state === "active"} 
+                  isGrenade 
+                />
+              ) : slot.type === 'bomb' ? (
+                <C4 />
+              ) : slot.type === 'defuse' ? (
+                <DefuseIcon />
+              ) : null}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

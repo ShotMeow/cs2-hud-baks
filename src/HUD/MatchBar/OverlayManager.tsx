@@ -81,6 +81,7 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
   const [matchData, setMatchData] = useState<Match | null>(null);
   const [killEvents, setKillEvents] = useState<I.KillEvent[]>([]);
   const [localRoundResults, setLocalRoundResults] = useState<RoundResult[]>([]);
+  const [previousRoundPlayers, setPreviousRoundPlayers] = useState<I.Player[]>([]);
   const hasProcessedRound = useRef(false);
 
   const currentRound = map.round + 1;
@@ -101,10 +102,10 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
     // RoundMVP - если есть данные о предыдущем раунде
     if (roundResults.length > 0) {
       const prevRoundResult = roundResults[currentRoundNum - 2];
-      if (prevRoundResult) {
+      if (prevRoundResult && previousRoundPlayers.length > 0) {
         const mvpData = calculateMVP({
           winner: { side: prevRoundResult.winner },
-          players: playersData
+          players: previousRoundPlayers
         });
 
         if (mvpData) {
@@ -148,7 +149,7 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
         duration: 5000
       });
     }
-  }, []);
+  }, [previousRoundPlayers]);
 
   const getRoundResults = useCallback((
     matchDataValue: Match | null,
@@ -226,6 +227,10 @@ const OverlayManager: React.FC<OverlayManagerProps> = ({ map, phase, players }) 
   // Handle round transitions and overlay display
   useEffect(() => {
     if (currentRound !== prevRound) {
+      // Сохраняем игроков предыдущего раунда перед обновлением
+      if (currentRound > prevRound && prevRound > 0) {
+        setPreviousRoundPlayers([...players]);
+      }
       setPrevRound(currentRound);
       hasProcessedRound.current = false;
     }

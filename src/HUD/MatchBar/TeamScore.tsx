@@ -29,6 +29,8 @@ const TeamScore = ({orientation, team, bo, wins }: IProps) => {
       return indicators;
     };
 
+    console.log(team);
+
     const teamName = team?.name || "";
     const displayName = teamName.length > 6 ? teamName.slice(0, 6) + "..." : teamName;
 

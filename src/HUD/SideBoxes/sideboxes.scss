@@ -152,7 +152,7 @@
 	
 	// Верхний блок: Loss Bonus + Equipment Value
 	.top-block {
-		backdrop-filter: blur(40px);
+		background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.6) 100%);
 		display: flex;
 		padding: 4px;
 		border-radius: 12px;
@@ -243,7 +243,7 @@
 	
 	// Нижний блок: Utility + Гранаты
 	.bottom-block {
-		backdrop-filter: blur(40px);
+		background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.6) 100%);
 		border-radius: 12px;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow: 

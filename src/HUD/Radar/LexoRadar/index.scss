@@ -59,8 +59,8 @@ html, body, .map-container {
     transition: opacity 0.5s ease;
     .content {
         position: absolute;
-        width: 30px;
-        height: 30px;
+        width: 50px !important;
+        height: 50px !important;
         display: flex;
         align-items: center;
         justify-content: center;

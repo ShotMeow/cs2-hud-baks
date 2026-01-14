@@ -1,18 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Player } from "csgogsi";
 import Weapon from "./../Weapon/Weapon";
-import Avatar from "./Avatar";
 import "./observed.scss";
 import { ArmorHelmet, ArmorFull, HealthFull } from './../../assets/Icons';
-import { useAction } from "../../API/contexts/actions";
 
 const Observed = ({ player }: { player: Player | null }) => {
-	const [ showCam, setShowCam ] = useState(true);
-
-	useAction('toggleCams', () => {
-		setShowCam(p => !p);
-	});
-
 	if (!player) return null;
 	
 	const currentWeapon = player.weapons.filter(weapon => weapon.state === "active")[0];
@@ -22,17 +14,6 @@ const Observed = ({ player }: { player: Player | null }) => {
 	
 	return (
 		<div className={`observed ${player.team.side}`}>
-			{/* Аватарка игрока */}
-			{player.avatar && <Avatar 
-				teamId={player.team.id} 
-				url={player.avatar} 
-				steamid={player.steamid} 
-				height={140} 
-				width={140} 
-				showCam={showCam} 
-				slot={player.observer_slot} 
-			/>}
-			
 			{/* Индикатор здоровья */}
 			<div className="health-bar">
 				<div className="health-fill" style={{ width: `${healthPercent}%` }}></div>
