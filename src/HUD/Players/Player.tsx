@@ -321,7 +321,7 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
 
   return (
     <div>
-      {showSaber && (
+      {showSaber && player.state.health > 0 && (
           <video 
             src={saber} 
             className="player-saber" 
@@ -358,7 +358,6 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
             url={player.avatar} 
             height={120} 
             width={132} 
-            showSkull={player.state.health === 0} 
             showCam={false} 
             sidePlayer={true} 
           /> : <div className="avatar-fallback"><span>{player.observer_slot}</span></div>}
