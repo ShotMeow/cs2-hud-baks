@@ -113,10 +113,12 @@ export const calculateMVP = (roundData: any): MVPData | null => {
         let maxUtilityDmg = 100;
 
         players.forEach(player => {
-          const utilDmg = player.state.round_totaldmg * 0.3; // Примерно 30% урона от утилити
-          if (utilDmg > maxUtilityDmg) {
-            maxUtilityDmg = utilDmg;
-            bestUtilityPlayer = player;
+          if (player.team.side === winningTeam) {
+            const utilDmg = player.state.round_totaldmg * 0.3; // Примерно 30% урона от утилити
+            if (utilDmg > maxUtilityDmg) {
+              maxUtilityDmg = utilDmg;
+              bestUtilityPlayer = player;
+            }
           }
         });
 
@@ -135,10 +137,12 @@ export const calculateMVP = (roundData: any): MVPData | null => {
           let maxSupport = 0;
 
           players.forEach(player => {
-            const supportScore = player.stats.assists * 2 + player.state.round_kills;
-            if (supportScore > maxSupport && player.stats.assists >= 2) {
-              maxSupport = supportScore;
-              bestSupportPlayer = player;
+            if (player.team.side === winningTeam) {
+              const supportScore = player.stats.assists * 2 + player.state.round_kills;
+              if (supportScore > maxSupport && player.stats.assists >= 2) {
+                maxSupport = supportScore;
+                bestSupportPlayer = player;
+              }
             }
           });
 
