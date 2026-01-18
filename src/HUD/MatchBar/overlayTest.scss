@@ -1,8 +1,10 @@
 .mvp-test-panel {
   position: fixed;
-  top: 300px;
+  bottom: 260px;
+  height: 600px;
   right: 20px;
   width: 300px;
+  overflow: auto;
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.9);
   border-radius: 12px;

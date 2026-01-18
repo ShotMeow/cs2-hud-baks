@@ -1,4 +1,5 @@
 import * as I from 'csgogsi';
+import { useCallback, useState } from 'react';
 import { useOverlayQueue } from './OverlayProvider';
 import RoundMVP, { MVPData } from './RoundMVP';
 import RoundSummary from './RoundSummary';
@@ -40,7 +41,7 @@ const createTestPlayer = (
     equip_value: 5000,
     adr: 80,
     defusekit: side === 'CT'
-  } as any,
+  } as I.Player["state"],
   stats: {
     kills: kills,
     assists: assists,
@@ -66,6 +67,60 @@ const createTestPlayer = (
 
 const OverlayTest = () => {
   const { enqueueOverlay, clearQueue } = useOverlayQueue();
+  const [devPauseMode, setDevPauseMode] = useState<"none" | "technical" | "tactical">("none");
+
+  const emitDevPhase = useCallback((mode: "none" | "technical" | "tactical") => {
+    const current = GSI.current;
+    if (!current) return;
+
+    const phase: I.CSGO["phase_countdowns"]["phase"] =
+      mode === "technical" ? "paused" : mode === "tactical" ? "timeout_ct" : current.phase_countdowns.phase;
+
+    const phase_countdowns: I.CSGO["phase_countdowns"] = {
+      ...current.phase_countdowns,
+      phase
+    };
+
+    GSI.emit("data", {
+      ...current,
+      phase_countdowns
+    });
+  }, []);
+
+  const setPauseMode = useCallback((mode: "none" | "technical" | "tactical") => {
+    setDevPauseMode(mode);
+    emitDevPhase(mode);
+  }, [emitDevPhase]);
+
+  const clearPauseMode = useCallback(() => {
+    setDevPauseMode("none");
+    emitDevPhase("none");
+  }, [emitDevPhase]);
+
+  const emitDevRoundWin = useCallback((winner: "CT" | "T") => {
+    const current = GSI.current;
+    if (!current) return;
+
+    const map = current.map;
+    const nextMap: I.Map = {
+      ...map,
+      round: map.round + 1,
+      team_ct: {
+        ...map.team_ct,
+        score: winner === "CT" ? map.team_ct.score + 1 : map.team_ct.score
+      },
+      team_t: {
+        ...map.team_t,
+        score: winner === "T" ? map.team_t.score + 1 : map.team_t.score
+      }
+    };
+
+    GSI.emit("data", {
+      ...current,
+      map: nextMap
+    });
+  }, []);
+
   const testClutchMVP = () => {
     const mvpData: MVPData = {
       player: createTestPlayer('ClutchKing', '76561198000000001', 'CT', 45, 3, 0, 320),
@@ -320,6 +375,23 @@ const OverlayTest = () => {
   return (
     <div className="mvp-test-panel">
       <h2>Overlay Test Panel</h2>
+
+      <div className="test-section">
+        <h3>MatchBar pause states (dev):</h3>
+        <div className="test-buttons">
+          <button onClick={() => setPauseMode("technical")} disabled={devPauseMode === "technical"}>⏸️ Technical pause</button>
+          <button onClick={() => setPauseMode("tactical")} disabled={devPauseMode === "tactical"}>🕒 Tactical pause</button>
+          <button onClick={clearPauseMode} disabled={devPauseMode === "none"}>▶️ Clear pause</button>
+        </div>
+      </div>
+
+      <div className="test-section">
+        <h3>Round win animation (dev):</h3>
+        <div className="test-buttons">
+          <button onClick={() => emitDevRoundWin("CT")}>CT wins round</button>
+          <button onClick={() => emitDevRoundWin("T")}>T wins round</button>
+        </div>
+      </div>
       
       <div className="test-section">
         <h3>MVP Оверлеи (5 сек каждый):</h3>
