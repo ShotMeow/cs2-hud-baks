@@ -6,8 +6,8 @@ import { useBombTimer } from "./../Timers/Countdown";
 import { Match } from './../../API/types';
 import { C4, Defuse } from "../../assets/Icons";
 import OverlayManager from "./OverlayManager";
-import technicalPauseIcon from "../../assets/states/technical-pause.svg";
-import tacticalPauseIcon from "../../assets/states/tactical-pause.svg";
+import TechnicalPauseIcon from "../../assets/states/technical-pause.svg?react";
+import TacticalPauseIcon from "../../assets/states/tactical-pause.svg?react";
 
 
 function stringToClock(time: string | number, pad = true) {
@@ -56,6 +56,14 @@ const Matchbar = (props: IProps) => {
       if (map.round !== prevRound) {
         setRoundWinSide(null);
         prevRoundRef.current = map.round;
+        prevScoresRef.current = { ct: map.team_ct.score, t: map.team_t.score };
+        return;
+      }
+
+      if (phase.phase !== "over") {
+        setRoundWinSide(null);
+        prevScoresRef.current = { ct: map.team_ct.score, t: map.team_t.score };
+        return;
       }
 
       const ctDelta = map.team_ct.score - prevScores.ct;
@@ -68,10 +76,11 @@ const Matchbar = (props: IProps) => {
       }
 
       prevScoresRef.current = { ct: map.team_ct.score, t: map.team_t.score };
-    }, [map.round, map.team_ct.score, map.team_t.score]);
+    }, [map.round, map.team_ct.score, map.team_t.score, phase.phase]);
 
     const pauseKind = phase.phase === "paused" ? "technical" : (phase.phase === "timeout_ct" || phase.phase === "timeout_t") ? "tactical" : null;
-    const pauseIcon = pauseKind === "technical" ? technicalPauseIcon : pauseKind === "tactical" ? tacticalPauseIcon : null;
+    const pauseSide: I.Side | null = phase.phase === "timeout_ct" ? "CT" : phase.phase === "timeout_t" ? "T" : null;
+    const PauseIcon = pauseKind === "technical" ? TechnicalPauseIcon : pauseKind === "tactical" ? TacticalPauseIcon : null;
 
     const bombData = useBombTimer();
     const plantTimer: Timer | null = bombData.state === "planting" ? { time:bombData.plantTime, active: true, side: bombData.player?.team.orientation || "right", player: bombData.player, type: "planting"} : null;
@@ -108,8 +117,17 @@ const Matchbar = (props: IProps) => {
                 </div>
               </div>
 
-              <div className={`pause-icon ${pauseKind ? "show" : ""} ${pauseKind || ""}`}>
-                {pauseIcon ? <img src={pauseIcon} alt={pauseKind === "technical" ? "Technical pause" : "Tactical pause"} /> : null}
+              <div
+                className={`pause-icon ${pauseKind ? "show" : ""} ${pauseKind || ""}`}
+                style={
+                  pauseSide === "CT"
+                    ? { color: "var(--color-new-ct)" }
+                    : pauseSide === "T"
+                      ? { color: "var(--color-new-t)" }
+                      : undefined
+                }
+              >
+                {PauseIcon ? <PauseIcon aria-label={pauseKind === "technical" ? "Technical pause" : "Tactical pause"} /> : null}
               </div>
             </div>
             <div className={`score right ${right.side}`}>{right.score}</div>

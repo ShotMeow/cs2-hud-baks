@@ -218,14 +218,16 @@
 		transform: translate(-50%, calc(-50% + 18px));
 		opacity: 0;
 		filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+		color: rgba(255, 255, 255, 0.8);
 		transition:
 			transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
 			opacity 260ms ease;
 		will-change: transform, opacity;
 		pointer-events: none;
 
-		img {
-			width: auto;
+		svg {
+			width: 42px;
+			height: 42px;
 			display: block;
 		}
 
