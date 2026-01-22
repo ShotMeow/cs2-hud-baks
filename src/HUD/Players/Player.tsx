@@ -321,7 +321,7 @@ const Player = ({ player, isObserved, lastKillEvent, bomb }: IProps) => {
 
   return (
     <div>
-      {showSaber && player.state.health > 0 && (
+      {true && player.state.health > 0 && (
           <video 
             src={saber} 
             className="player-saber" 

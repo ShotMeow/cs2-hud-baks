@@ -34,8 +34,9 @@
 	background-color: var(--sub-panel-color);
 
 	.bestof {
-		width: 121px;
-		font-size: 16px;
+		font-size: 20px;
+		letter-spacing: 0.5px;
+		text-wrap: nowrap;
 		display: flex;
 		align-items: center;
 		justify-content: center;

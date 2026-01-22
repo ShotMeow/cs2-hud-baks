@@ -61,7 +61,6 @@
         height: 100%;
         will-change: transform;
         transform: translateZ(0);
-        padding-bottom: 8px;
         display: flex;
         flex-direction: column;
         margin-bottom: 4px;
@@ -91,7 +90,8 @@
             background: linear-gradient(135deg, rgba(9, 10, 18, 0.9) 0%, rgba(9, 10, 18, 0.7) 100%);
             backdrop-filter: blur(40px);
             padding: 4px;
-            border-radius: 12px;
+            margin: 2px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -162,6 +162,7 @@
                     z-index: 1;
                     color: white;
                     font-size: 20px;
+                    letter-spacing: 1px;
                     overflow: hidden;
                     width: 62px;
                     text-align: center;
@@ -245,7 +246,7 @@
             align-items: center;
             font-size: 20px;
             text-transform: uppercase;
-            padding: 0 4px;
+            padding: 0 8px 4px;
             height: 28px;
 
             .kd-stat {
@@ -293,6 +294,7 @@
                 width: 16px;
                 height: 16px;
                 transition: filter 0.2s ease;
+                padding-bottom: 8px;
 
                 svg.grenade {
                     width: 16px;
@@ -374,7 +376,7 @@
 
 .player-saber {
     position: absolute;
-    transform: translate(-92px, -140px) scaleY(1.08);
+    transform: translate(-92px, -137px) scaleY(1.08);
     z-index: -10;
     width: 320px;
     will-change: transform, opacity;

@@ -74,6 +74,16 @@ const Layout = ({game,match}: Props) => {
       }, 3000);
     }
     
+    // Check for bomb planting cancellation (when state changes FROM planting TO something else)
+    if (previousBombState === 'planting' && currentBombState !== 'planting') {
+      // Clear the timeout and hide video immediately
+      if (bombVideoTimeoutRef.current) {
+        clearTimeout(bombVideoTimeoutRef.current);
+        bombVideoTimeoutRef.current = null;
+      }
+      setBombVideo(null);
+    }
+    
     // Check for bomb defusing start (when state changes TO defusing)
     if (currentBombState === 'defusing' && previousBombState !== 'defusing') {
       const hasDefuseKit = bombData.player?.state.defusekit || false;
@@ -90,6 +100,16 @@ const Layout = ({game,match}: Props) => {
       bombVideoTimeoutRef.current = setTimeout(() => {
         setBombVideo(null);
       }, hasDefuseKit ? 5000 : 10000);
+    }
+    
+    // Check for bomb defusing cancellation (when state changes FROM defusing TO something else)
+    if (previousBombState === 'defusing' && currentBombState !== 'defusing') {
+      // Clear the timeout and hide video immediately
+      if (bombVideoTimeoutRef.current) {
+        clearTimeout(bombVideoTimeoutRef.current);
+        bombVideoTimeoutRef.current = null;
+      }
+      setBombVideo(null);
     }
     
     // Update previous state
