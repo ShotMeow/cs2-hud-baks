@@ -1,6 +1,7 @@
 import * as I from "csgogsi";
 import { Timer } from "./MatchBar";
 import TeamLogo from './TeamLogo';
+import saberAnimation from './../../assets/saber-square.webm';
 
 interface IProps {
   orientation: "left" | "right";
@@ -9,9 +10,12 @@ interface IProps {
   bo: number;
   wins: number;
   showRoundWin: boolean;
+  streak: number;
 }
 
-const TeamScore = ({orientation, team, bo, wins, showRoundWin }: IProps) => {
+const TeamScore = ({orientation, team, bo, wins, showRoundWin, streak }: IProps) => {
+
+    const showSaberAnimation = streak >= 3;
 
     const renderWinIndicators = () => {
       if (bo === 0) return null;
@@ -39,7 +43,19 @@ const TeamScore = ({orientation, team, bo, wins, showRoundWin }: IProps) => {
           <div className={`team ${orientation} ${team.side || ''}`}>
             <div className={`team-content ${showRoundWin ? 'is-hidden' : ''}`}>
               <div className="team-name">{displayName || null}</div>
-              <TeamLogo team={team} />
+              <div className="logo-container">
+                <TeamLogo team={team} />
+                {showSaberAnimation && (
+                  <video 
+                    className="saber-animation" 
+                    src={saberAnimation}
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                  />
+                )}
+              </div>
               {bo > 1 && (
                 <div className={`win-indicators ${orientation}`}>
                   {renderWinIndicators()}

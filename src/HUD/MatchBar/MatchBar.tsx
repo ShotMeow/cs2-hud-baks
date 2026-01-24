@@ -46,6 +46,8 @@ const Matchbar = (props: IProps) => {
     const right = map.team_ct.orientation === "left" ? map.team_t : map.team_ct;
 
     const [roundWinSide, setRoundWinSide] = useState<I.Side | null>(null);
+    const [ctStreak, setCtStreak] = useState(0);
+    const [tStreak, setTStreak] = useState(0);
     const prevScoresRef = useRef({ ct: map.team_ct.score, t: map.team_t.score });
     const prevRoundRef = useRef(map.round);
 
@@ -71,8 +73,12 @@ const Matchbar = (props: IProps) => {
 
       if (ctDelta > 0 && tDelta === 0) {
         setRoundWinSide("CT");
+        setCtStreak(prev => prev + 1);
+        setTStreak(0);
       } else if (tDelta > 0 && ctDelta === 0) {
         setRoundWinSide("T");
+        setTStreak(prev => prev + 1);
+        setCtStreak(0);
       }
 
       prevScoresRef.current = { ct: map.team_ct.score, t: map.team_t.score };
@@ -99,10 +105,13 @@ const Matchbar = (props: IProps) => {
     const isBombPlanted = bombData.state === "planted" || bombData.state === "defusing";
     const isDefusing = bombData.state === "defusing";
 
+    const leftStreak = left.side === "CT" ? ctStreak : tStreak;
+    const rightStreak = right.side === "CT" ? ctStreak : tStreak;
+
     return (
       <>
         <div id={`matchbar`}>
-          <TeamScore team={left} orientation={"left"} timer={left.side === "CT" ? defuseTimer : plantTimer} bo={bo} wins={leftWins} showRoundWin={roundWinSide === left.side} />
+          <TeamScore team={left} orientation={"left"} timer={left.side === "CT" ? defuseTimer : plantTimer} bo={bo} wins={leftWins} showRoundWin={roundWinSide === left.side} streak={leftStreak} />
           <div id="timer">
             <div className={`score left ${left.side}`}>{left.score}</div>
             <div className="round-info-slot">
@@ -132,7 +141,7 @@ const Matchbar = (props: IProps) => {
             </div>
             <div className={`score right ${right.side}`}>{right.score}</div>
           </div>
-          <TeamScore team={right} orientation={"right"} timer={right.side === "CT" ? defuseTimer : plantTimer} bo={bo} wins={rightWins} showRoundWin={roundWinSide === right.side} />
+          <TeamScore team={right} orientation={"right"} timer={right.side === "CT" ? defuseTimer : plantTimer} bo={bo} wins={rightWins} showRoundWin={roundWinSide === right.side} streak={rightStreak} />
         </div>
         
         {/* Индикаторы бомбы и дефуза */}
