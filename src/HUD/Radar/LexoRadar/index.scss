@@ -173,8 +173,6 @@ html, body, .map-container {
     background-image: url('./grenades/smoke.png');
     filter: invert(1);
 }
-.map .grenade.smoke.exploded .background {
-}
 .map .grenade.flashbang, .map .grenade.frag {
     filter: invert(1);
 }
@@ -205,12 +203,12 @@ html, body, .map-container {
     background-color: rgba(255,255,255,0.5);
 }
 .map .grenade.smoke.CT .background {
-    border: 5px solid var(--color-new-ct);
-    background-color: rgba(255, 255, 255,0.5);
+    background-color: var(--color-new-ct);
+    opacity: 0.5;
 }
 .map .grenade.smoke.T .background {
-    border: 5px solid var(--color-new-t);
-    background-color: rgba(255, 255, 255,0.5);
+    background-color: var(--color-new-t);
+    opacity: 0.5;
 }
 .map .grenade.firebomb .background {
     background-color:transparent;
@@ -227,8 +225,16 @@ html, body, .map-container {
 .map .grenade.inferno .background {
     background-color: red;
     opacity: 0.5;
-    border: 2px solid orange;
 }
+.map .grenade.inferno.CT .background {
+    background-color: var(--color-new-ct);
+    opacity: 0.5;
+}
+.map .grenade.inferno.T .background {
+    background-color: var(--color-new-t);
+    opacity: 0.5;
+}
+
 .map .player .background, .map .player .label,.map .grenade .background, .map .bomb .background {
     position: absolute;
     width:100%;
