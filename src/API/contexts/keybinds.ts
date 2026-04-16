@@ -10,5 +10,9 @@ export const keybindDefinition = [
   {
     "bind": "Alt+B",
     "action": "radarSmaller"
+  },
+  {
+    "bind": "Alt+M",
+    "action": "toggleVeto"
   }
 ] as const;

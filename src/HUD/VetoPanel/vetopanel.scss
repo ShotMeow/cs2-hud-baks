@@ -1,0 +1,235 @@
+.veto-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  padding: 0 40px 28px;
+  pointer-events: none;
+
+  &__track {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: flex-end;
+  }
+}
+
+// ─── Individual card ─────────────────────────────────────
+
+.veto-card {
+  position: relative;
+  width: 170px;
+  height: 240px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: default;
+
+  // Entry animation
+  opacity: 0;
+  transform: translateY(120%) scale(0.92);
+  transition:
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 380ms ease;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  // ── Background image layer ──
+  &__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &:hover &__bg {
+    transform: scale(1.08);
+  }
+
+  // ── Dark gradient overlay ──
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.45) 40%,
+      rgba(0, 0, 0, 0.18) 100%
+    );
+    transition: background 300ms ease;
+  }
+
+  // ── Ban card style ──
+  &.ban {
+    width: 120px;
+    height: 180px;
+
+    .veto-card__bg {
+      filter: grayscale(1) brightness(0.4);
+    }
+
+    .veto-card__overlay {
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(180, 30, 30, 0.15) 100%
+      );
+    }
+
+    .veto-card__name {
+      font-size: 18px;
+      opacity: 0.5;
+      text-decoration: line-through;
+      text-decoration-color: rgba(255, 60, 60, 0.6);
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  // ── Active (currently playing) card ──
+  &.active {
+    width: 200px;
+    height: 260px;
+    box-shadow:
+      0 0 0 2px rgba(0, 234, 250, 0.7),
+      0 0 30px rgba(0, 234, 250, 0.2),
+      0 12px 40px rgba(0, 0, 0, 0.5);
+
+    .veto-card__overlay {
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.88) 0%,
+        rgba(0, 0, 0, 0.3) 45%,
+        rgba(0, 234, 250, 0.06) 100%
+      );
+    }
+  }
+
+  // ── Type badge (top-left) ──
+  &__type {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    backdrop-filter: blur(12px);
+
+    &.pick {
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    &.ban {
+      background: rgba(255, 50, 50, 0.2);
+      color: rgba(255, 100, 100, 0.9);
+      border: 1px solid rgba(255, 50, 50, 0.25);
+    }
+
+    &.decider {
+      background: rgba(255, 200, 50, 0.15);
+      color: rgba(255, 210, 80, 0.95);
+      border: 1px solid rgba(255, 200, 50, 0.2);
+    }
+  }
+
+  // ── LIVE badge (top-right) ──
+  &__live {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0, 234, 250, 0.2);
+    color: #00eafa;
+    border: 1px solid rgba(0, 234, 250, 0.35);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  // ── Map name (bottom) ──
+  &__name {
+    position: absolute;
+    bottom: 42px;
+    left: 14px;
+    right: 14px;
+    z-index: 2;
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  // ── Footer (team logos, score) ──
+  &__footer {
+    position: absolute;
+    bottom: 10px;
+    left: 14px;
+    right: 14px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__picker {
+    img, .logo {
+      height: 22px;
+      width: 22px;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+    }
+  }
+
+  &__result {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__score {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+  }
+
+  &__winner {
+    img, .logo {
+      height: 20px;
+      width: 20px;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+    }
+  }
+}
+
+// ─── Animations ──────────────────────────────────────────
+
+@keyframes livePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 234, 250, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 8px 2px rgba(0, 234, 250, 0.15);
+  }
+}

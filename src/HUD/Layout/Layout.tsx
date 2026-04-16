@@ -16,6 +16,8 @@ import bombPlant from "../../assets/bombs/HUD_Bomb_Plant.webm";
 import defuse10s from "../../assets/bombs/HUD_Bomb_Defuse_10s.webm";
 import defuse5s from "../../assets/bombs/HUD_Bomb_Defuse_5s.webm";
 import OverlayTest from "../MatchBar/OverlayTest";
+import VetoPanel from "../VetoPanel/VetoPanel";
+import { useAction } from "../../API/contexts/actions";
 
 interface Props {
   game: CSGO,
@@ -30,10 +32,23 @@ interface State {
 
 const Layout = ({game,match}: Props) => {
   const [lastKillEvent, setLastKillEvent] = useState<KillEvent | null>(null);
+  const [vetoVisible, setVetoVisible] = useState(false);
   const [bombVideo, setBombVideo] = useState<string | null>(null);
   const bombVideoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousBombStateRef = useRef<string | null>(null);
   
+  // Alt+M toggle veto panel in browser
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.altKey && e.key.toLowerCase() === "m") {
+        e.preventDefault();
+        setVetoVisible((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   // Use the existing bomb timer hook
   const bombData = useBombTimer();
 
@@ -129,6 +144,11 @@ const Layout = ({game,match}: Props) => {
   const leftPlayers = game.players.filter(player => player.team.side === left.side);
   const rightPlayers = game.players.filter(player => player.team.side === right.side);
   const isFreezetime = (game.round && game.round.phase === "freezetime") || game.phase_countdowns.phase === "freezetime";
+
+  useAction("toggleVeto", () => {
+    setVetoVisible((v) => !v);
+  }, []);
+
   return (
       <div className="layout">
         <OverlayProvider>
@@ -156,16 +176,24 @@ const Layout = ({game,match}: Props) => {
         <RadarMaps match={match} map={game.map} game={game} />
         <MatchBar map={game.map} phase={game.phase_countdowns} bomb={game.bomb} match={match} players={game.players} />
 
-        <Observed player={game.player} />
+        <div className={`bottom-panels ${vetoVisible ? "hide" : ""}`}>
+          <Observed player={game.player} />
+          <TeamBox team={left} players={leftPlayers} side="left" current={game.player} lastKillEvent={lastKillEvent} bomb={game.bomb} />
+          <TeamBox team={right} players={rightPlayers} side="right" current={game.player} lastKillEvent={lastKillEvent} bomb={game.bomb} />
+        </div>
 
-        <TeamBox team={left} players={leftPlayers} side="left" current={game.player} lastKillEvent={lastKillEvent} bomb={game.bomb} />
-        <TeamBox team={right} players={rightPlayers} side="right" current={game.player} lastKillEvent={lastKillEvent} bomb={game.bomb} />
+        <VetoPanel
+          match={match}
+          teams={[left, right]}
+          currentMapName={game.map.name}
+          visible={vetoVisible}
+        />
 
         <Scout left={left.side} right={right.side} />
-        <div className={"boxes left"}>
-          <UtilityLevel 
-            side={left.side} 
-            players={game.players} 
+        <div className={`boxes left ${vetoVisible ? "veto-away" : ""}`}>
+          <UtilityLevel
+            side={left.side}
+            players={game.players}
             show={isFreezetime}
             loss={Math.min(left.consecutive_round_losses * 500 + 1400, 3400)}
             equipment={leftPlayers.map(player => player.state.equip_value).reduce((pre, now) => pre + now, 0)}
@@ -173,10 +201,10 @@ const Layout = ({game,match}: Props) => {
             orientation="left"
           />
         </div>
-        <div className={"boxes right"}>
-          <UtilityLevel 
-            side={right.side} 
-            players={game.players} 
+        <div className={`boxes right ${vetoVisible ? "veto-away" : ""}`}>
+          <UtilityLevel
+            side={right.side}
+            players={game.players}
             show={isFreezetime}
             loss={Math.min(right.consecutive_round_losses * 500 + 1400, 3400)}
             equipment={rightPlayers.map(player => player.state.equip_value).reduce((pre, now) => pre + now, 0)}

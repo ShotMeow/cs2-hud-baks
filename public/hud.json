@@ -1,13 +1,13 @@
 {
-    "name":"BAKS HUD",
-    "version":"1.0.7",
-    "author":"BAKS",
-    "legacy": false,
-    "radar": true,
-    "killfeed": true,
-    "game":"cs2",
-    "boltobserv":{
-        "css":false,
-        "maps":false
-    }
+  "name": "BAKS HUD",
+  "version": "1.0.8",
+  "author": "BAKS",
+  "legacy": false,
+  "radar": true,
+  "killfeed": true,
+  "game": "cs2",
+  "boltobserv": {
+    "css": false,
+    "maps": false
+  }
 }

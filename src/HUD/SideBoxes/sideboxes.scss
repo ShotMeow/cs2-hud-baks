@@ -1,12 +1,23 @@
 .boxes {
 	position: fixed;
 	bottom: 244px;
+	transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms ease;
 }
 .boxes.left {
 	left: 20px;
 }
 .boxes.right {
 	right: 20px;
+}
+.boxes.left.veto-away {
+	transform: translateX(-120%);
+	opacity: 0;
+	pointer-events: none;
+}
+.boxes.right.veto-away {
+	transform: translateX(120%);
+	opacity: 0;
+	pointer-events: none;
 }
 .boxes.hide {
 	.utilitybox {
